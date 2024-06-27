@@ -1,0 +1,22 @@
+{
+  "name": "UrlMage",
+  "version": "1.0.0",
+  "description": "Url Manipulation Thing",
+  "type": "module",
+  "main": "UrlMage.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "tsup": "^8.1.0"
+  }
+}
