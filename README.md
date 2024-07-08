@@ -1,120 +1,154 @@
-# UrlMage
+# UrlMage 🧙‍♂️
 
-UrlMage is a URL manipulation thing for TypeScript and JavaScript, providing a robust and intuitive API for parsing, modifying, and constructing URLs. 
+UrlMage is a powerful, lightweight, and dependency-free URL manipulation library for TypeScript and JavaScript. It provides a robust and intuitive API for parsing, modifying, and constructing URLs with ease.
 
-## Features
+## 🚀 Features
 
-- Parse URLs into their component parts
-- Modify URL components (protocol, domain, path, query parameters, hash)
-- Construct URLs from objects
-- Normalize and clean URLs
-- Handle query parameters with ease, including array parameters
-- Encode and decode URL components
-- Chainable methods for fluent API usage
+- 🔧 Comprehensive URL manipulation (protocol, domain, path, query, hash)
+- 🔍 Advanced parsing and analysis
+- 🔗 Fluent interface for method chaining
+- 🔒 Type-safe operations with TypeScript
+- 🧩 Modular design for easy integration
+- 🏗️ Static utility methods for common operations
 
-## Basic Usage 
-
-```ts
-import { UrlMage } from 'urlmage';
-
-const url = new UrlMage('https://example.com/path?query=value#hash');
-
-console.log(url.protocol); // 'https'
-console.log(url.domain); // 'example.com'
-console.log(url.path); // '/path'
-console.log(url.query); // { query: 'value' }
-console.log(url.getHash()); // 'hash'
-```
-
-## Modyfying URLs
+## 📦 Installation
 
 ```ts
-const url = new UrlMage('https://example.com');
-
-url.setProtocol('http')
-   .setDomain('newexample.com')
-   .setPath('/new/path')
-   .setQuery('newParam', 'newValue')
-   .setHash('newSection');
-
-console.log(url.toString()); // 'http://newexample.com/new/path?newParam=newValue#newSection'
+npm install urlmage
 ```
 
-## Working with Query Parameters
+## 🔧 Usage
 
 ```ts
-const url = new UrlMage('https://example.com');
+import { UrlMage } from "urlmage";
 
-url.appendQuery('arrayParam', 'value1')
-   .appendQuery('arrayParam', 'value2');
+const url = new UrlMage("https://example.com/path?query=value#hash");
 
-console.log(url.getQueryArray('arrayParam')); // ['value1', 'value2']
+// Modify URL components
+url
+  .setProtocol("http")
+  .setDomain("newdomain.com")
+  .addPathSegment("newpath")
+  .setQuery("newquery", "newvalue")
+  .setHash("newhash");
 
-url.toggleQueryParam('toggleParam', 'on');
-console.log(url.toString()); // 'https://example.com?arrayParam=value1&arrayParam=value2&toggleParam=on'
+console.log(url.toString());
+// Output: http://newdomain.com/path/newpath?query=value&newquery=newvalue#newhash
 
-url.toggleQueryParam('toggleParam', 'on');
-console.log(url.toString()); // 'https://example.com?arrayParam=value1&arrayParam=value2'
+// Analyze URL
+console.log(url.domain); // newdomain.com
+console.log(url.getSegments()); // ['path', 'newpath']
+console.log(url.query); // { query: 'value', newquery: 'newvalue' }
+
+// Use static methods
+console.log(UrlMage.isValid("https://example.com")); // true
+console.log(UrlMage.combine("/path", "to", "/resource")); // /path/to/resource
 ```
 
-## URL Normalization
-
-```ts
-const messyUrl = new UrlMage('HTTPS://ExAmPlE.CoM/PATH///to/page/');
-messyUrl.normalizeProtocol().normalizeDomain().removeTrailingSlash();
-
-console.log(messyUrl.toString()); // 'https://example.com/PATH/to/page'
-```
-
-## API Reference
+## 📘 API Reference
 
 ### Constructor
 
-- new UrlMage(url: string)`
+`constructor(url: string)`
 
-### Properties
-- `protocol: string`
-- `domain: string`
-- `path: string`
-- `query: Record<string, string>`
+### Getters
 
-### Methods
+`protocol: string`
 
-- `setProtocol(protocol: string): UrlMage`
-- `setDomain(domain: string): UrlMage`
-- `setPath(path: string): UrlMage`
-- `setQuery(key: string, value: QueryValue): UrlMage`
-- `addPathSegment(segment: string): UrlMage`
-- `removeLastPathSegment(): UrlMage`
-- `setQueryObject(queryObject: Record<string, QueryValue>): UrlMage`
-- `appendQuery(key: string, value: QueryValue): UrlMage`
-- `getQueryArray(key: string): string[]`
-- `toggleQueryParam(key: string, value: string): UrlMage`
-- `normalizeProtocol(): UrlMage`
-- `normalizeDomain(): UrlMage`
-- `removeTrailingSlash(): UrlMage`
-- `getSegments(): string[]`
-- `isSubdomainOf(domain: string): boolean`
-- `swapProtocol(newProtocol: string): UrlMage`
-- `removeQuery(key: string): UrlMage`
-- `encode(): string`
-- `decode(): string`
-- `toString(): string`
-- `clone(): UrlMage`
-- `getOrigin(): string`
-- `hasQueryParam(key: string): boolean`
-- `getPort(): string`
-- `setPort(port: number): UrlMage`
-- `removePort(): UrlMage`
-- `getHash(): string`
-- `setHash(hash: string): UrlMage`
-- `removeHash(): UrlMage`
-- `isAbsolute(): boolean`
-- `isRelative(): boolean`
+`domain: string`
+
+`path: string`
+
+`query: Record<string, string>`
+
+### Setters
+
+`setProtocol(protocol: string): UrlMage`
+
+`setDomain(domain: string): UrlMage`
+
+`setPath(path: string): UrlMage`
+
+`setQuery(key: string, value: QueryValue): UrlMage`
+
+### Advanced Methods
+
+`addPathSegment(segment: string): UrlMage`
+
+`removeLastPathSegment(): UrlMage`
+
+`setQueryObject(queryObject: Record<string, QueryValue>): UrlMage`
+
+`appendQuery(key: string, value: QueryValue): UrlMage`
+
+`getQueryArray(key: string): string[]`
+
+`toggleQueryParam(key: string, value: string): UrlMage`
+
+`normalizeProtocol(): UrlMage`
+
+`normalizeDomain(): UrlMage`
+
+`removeTrailingSlash(): UrlMage`
+
+`getSegments(): string[]`
+
+`isSubdomainOf(domain: string): boolean`
+
+`swapProtocol(newProtocol: string): UrlMage`
+
+`removeQuery(key: string): UrlMage`
+
+`encode(): string`
+
+`decode(): string`
+
+`toString(): string`
+
+`clone(): UrlMage`
+
+### Utility Methods
+
+`getOrigin(): string`
+
+`hasQueryParam(key: string): boolean`
+
+`getPort(): string`
+
+`setPort(port: number): UrlMage`
+
+`removePort(): UrlMage`
+
+`getHash(): string`
+
+`setHash(hash: string): UrlMage`
+
+`removeHash(): UrlMage`
+
+`isAbsolute(): boolean`
+
+`isRelative(): boolean`
 
 ### Static Methods
 
-- `UrlMage.isValid(url: string): boolean`
-- `UrlMage.combine(...parts: string[]): string`
-- `UrlMage.fromObject(urlObject: UrlObject): UrlMage`
-- `UrlMage.parseQuery(queryString: string): Record<string, string | string[]>`
+`isValid(url: string): boolean`
+
+`combine(...parts: string[]): string`
+
+`fromObject(urlObject: UrlObject): UrlMage`
+
+`parseQuery(queryString: string): Record<string, string | string[]>`
+
+## 🧪 Types
+
+```ts
+type QueryValue = string | number | boolean | null | undefined;
+
+interface UrlObject {
+  protocol?: string;
+  domain: string;
+  path?: string;
+  query?: Record<string, QueryValue>;
+  hash?: string;
+}
+```
