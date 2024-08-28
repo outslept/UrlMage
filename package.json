@@ -17,6 +17,6 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "tsup": "^8.1.0"
+    "tsup": "^8.2.4"
   }
 }
