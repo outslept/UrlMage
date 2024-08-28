@@ -261,17 +261,6 @@ export class UrlMage {
   }
 
   /**
-   * Sorts the query parameters alphabetically.
-   */
-  sortQueryParams(): UrlMage {
-    const sortedParams = new URLSearchParams(
-      [...this.url.searchParams.entries()].sort(),
-    )
-    this.url.search = sortedParams.toString()
-    return this
-  }
-
-  /**
    * Toggles a boolean query parameter.
    * @param {string} key - The key of the query parameter to toggle.
    */
@@ -790,19 +779,6 @@ export class UrlMage {
   hasQueryParams(): boolean {
     return this.url.searchParams.toString() !== ''
   }
-
-  /**
-   * Removes all empty query parameters (those with empty string values).
-   */
-  removeEmptyQueryParams(): UrlMage {
-    for (const [key, value] of this.url.searchParams.entries()) {
-      if (value === '') {
-        this.url.searchParams.delete(key)
-      }
-    }
-    return this
-  }
-
   /**
    * Checks if the URL is a valid email address (mailto: URL).
    * @returns {boolean} True if the URL is a valid mailto URL, false otherwise.
@@ -1110,22 +1086,6 @@ export class UrlMage {
   }
 
   /**
-   * Extracts all email addresses from the URL's query parameters.
-   * @returns {string[]} An array of email addresses found in the query parameters.
-   */
-  extractEmailsFromQuery(): string[] {
-    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
-    const emails: string[] = []
-    for (const [, value] of this.url.searchParams) {
-      const matches = value.match(emailRegex)
-      if (matches) {
-        emails.push(...matches)
-      }
-    }
-    return emails
-  }
-
-  /**
    * Checks if the URL is potentially malicious (e.g., contains suspicious keywords).
    * @returns {boolean} True if the URL is potentially malicious, false otherwise.
    */
@@ -1179,7 +1139,6 @@ export class UrlMage {
     this.removeDefaultPort()
     this.removeTrailingSlash()
     this.toLowerCase()
-    this.sortQueryParams()
     return this
   }
 

@@ -1,154 +1,52 @@
 # UrlMage 🧙‍♂️
 
-UrlMage is a powerful, lightweight, and dependency-free URL manipulation library for TypeScript and JavaScript. It provides a robust and intuitive API for parsing, modifying, and constructing URLs with ease.
+UrlMage is a powerful and flexible URL manipulation library for TypeScript and JavaScript. It provides a comprehensive set of methods to parse, manipulate, and transform URLs with ease.
 
-## 🚀 Features
+## Features
 
-- 🔧 Comprehensive URL manipulation (protocol, domain, path, query, hash)
-- 🔍 Advanced parsing and analysis
-- 🔗 Fluent interface for method chaining
-- 🔒 Type-safe operations with TypeScript
-- 🧩 Modular design for easy integration
-- 🏗️ Static utility methods for common operations
+- 🔧 Parse and manipulate URL components (protocol, hostname, path, query parameters, etc.)
+- 🔄 Transform URLs between different formats (e.g., HTTP to HTTPS, market: to Play Store)
+- 🔍 Extract information from specialized URLs (e.g., magnet links, geo URLs, FaceTime)
+- 🛡️ Validate URLs for specific protocols and formats
+- 🧹 Normalize and clean URLs
+- 🔗 Handle various URL schemes (http, https, ftp, mailto, tel, sms, and more)
 
-## 📦 Installation
-
-```ts
-npm install urlmage
-```
-
-## 🔧 Usage
+## Usage
 
 ```ts
-import { UrlMage } from "urlmage";
+import { UrlMage } from 'urlmage'
 
-const url = new UrlMage("https://example.com/path?query=value#hash");
+const url = new UrlMage('https://example.com/path?query=value#hash')
 
-// Modify URL components
+// Manipulate URL components
 url
-  .setProtocol("http")
-  .setDomain("newdomain.com")
-  .addPathSegment("newpath")
-  .setQuery("newquery", "newvalue")
-  .setHash("newhash");
+  .setProtocol('http')
+  .setHostname('newexample.com')
+  .addQueryParam('newParam', 'newValue')
+  .removeHash()
 
-console.log(url.toString());
-// Output: http://newdomain.com/path/newpath?query=value&newquery=newvalue#newhash
+console.log(url.toString())
+// Output: http://newexample.com/path?query=value&newParam=newValue
 
-// Analyze URL
-console.log(url.domain); // newdomain.com
-console.log(url.getSegments()); // ['path', 'newpath']
-console.log(url.query); // { query: 'value', newquery: 'newvalue' }
+// Transform URLs
+const gitUrl = new UrlMage('git@github.com:user/repo.git')
+gitUrl.gitUrlToHttps()
+console.log(gitUrl.toString())
+// Output: https://github.com/user/repo
 
-// Use static methods
-console.log(UrlMage.isValid("https://example.com")); // true
-console.log(UrlMage.combine("/path", "to", "/resource")); // /path/to/resource
+// Validate URLs
+const wsUrl = new UrlMage('ws://example.com/socket')
+console.log(wsUrl.isValidWebSocketUrl()) // true
+
+// Extract information
+const geoUrl = new UrlMage('geo:37.786971,-122.399677')
+console.log(geoUrl.extractGeoCoordinates()) // [37.786971, -122.399677]
 ```
 
-## 📘 API Reference
+## API Documentation
 
-### Constructor
+For detailed API documentation, please refer to the [API.md](/API.md) file.
 
-`constructor(url: string)`
+## Contributing
 
-### Getters
-
-`protocol: string`
-
-`domain: string`
-
-`path: string`
-
-`query: Record<string, string>`
-
-### Setters
-
-`setProtocol(protocol: string): UrlMage`
-
-`setDomain(domain: string): UrlMage`
-
-`setPath(path: string): UrlMage`
-
-`setQuery(key: string, value: QueryValue): UrlMage`
-
-### Advanced Methods
-
-`addPathSegment(segment: string): UrlMage`
-
-`removeLastPathSegment(): UrlMage`
-
-`setQueryObject(queryObject: Record<string, QueryValue>): UrlMage`
-
-`appendQuery(key: string, value: QueryValue): UrlMage`
-
-`getQueryArray(key: string): string[]`
-
-`toggleQueryParam(key: string, value: string): UrlMage`
-
-`normalizeProtocol(): UrlMage`
-
-`normalizeDomain(): UrlMage`
-
-`removeTrailingSlash(): UrlMage`
-
-`getSegments(): string[]`
-
-`isSubdomainOf(domain: string): boolean`
-
-`swapProtocol(newProtocol: string): UrlMage`
-
-`removeQuery(key: string): UrlMage`
-
-`encode(): string`
-
-`decode(): string`
-
-`toString(): string`
-
-`clone(): UrlMage`
-
-### Utility Methods
-
-`getOrigin(): string`
-
-`hasQueryParam(key: string): boolean`
-
-`getPort(): string`
-
-`setPort(port: number): UrlMage`
-
-`removePort(): UrlMage`
-
-`getHash(): string`
-
-`setHash(hash: string): UrlMage`
-
-`removeHash(): UrlMage`
-
-`isAbsolute(): boolean`
-
-`isRelative(): boolean`
-
-### Static Methods
-
-`isValid(url: string): boolean`
-
-`combine(...parts: string[]): string`
-
-`fromObject(urlObject: UrlObject): UrlMage`
-
-`parseQuery(queryString: string): Record<string, string | string[]>`
-
-## 🧪 Types
-
-```ts
-type QueryValue = string | number | boolean | null | undefined;
-
-interface UrlObject {
-  protocol?: string;
-  domain: string;
-  path?: string;
-  query?: Record<string, QueryValue>;
-  hash?: string;
-}
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
