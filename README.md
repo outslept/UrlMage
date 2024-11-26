@@ -1,8 +1,8 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg">
-    <img alt="UrlMage" src="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg">
+  <picture >
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg" width=50% height=50%>
+    <img alt="UrlMage" src="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
   </picture>
 </p>
 
@@ -38,19 +38,19 @@
 
 > [!CAUTION]
 > This work is still in progress.
-> 
+
 ## Special Handlers
 
 UrlMage includes specialized handlers for various platforms:
 
-* 💬 Discord
-* 🐙 GitHub
-* ✉️ Mail
-* 🎮 Play Market
-* 🎵 Spotify
-* 🎲 Steam
-* 📱 Telegram
-* 💭 WhatsApp
+- 💬 Discord
+- 🐙 GitHub
+- ✉️ Mail
+- 🎮 Play Market
+- 🎵 Spotify
+- 🎲 Steam
+- 📱 Telegram
+- 💭 WhatsApp
 
 > [!CAUTION]
 > This work is still in progress. This list is subject to change.
