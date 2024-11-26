@@ -1,8 +1,10 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg">
-  <img alt="UrlMage" src="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg">
+    <img alt="UrlMage" src="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg">
+  </picture>
+</p>
 
 <p align="center">
   <strong>Powerful URL Manipulation Library for TypeScript</strong>
