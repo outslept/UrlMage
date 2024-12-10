@@ -10,7 +10,7 @@
 		"image-size": "1.1.1",
 		"jose": "5.9.6",
 		"keyv": "5.2.1",
-		"nanoid": "5.0.8",
+		"nanoid": "5.0.9",
 		"p-memoize": "7.1.1",
 		"p-queue": "8.0.1",
 		"parse-domain": "8.2.2",
