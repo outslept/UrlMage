@@ -9,7 +9,7 @@
 		"http-errors": "2.0.0",
 		"image-size": "1.1.1",
 		"jose": "5.9.6",
-		"keyv": "5.2.1",
+		"keyv": "5.2.2",
 		"nanoid": "5.0.9",
 		"p-memoize": "7.1.1",
 		"p-queue": "8.0.1",
