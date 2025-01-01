@@ -7,7 +7,7 @@
 		"date-fns": "4.1.0",
 		"fastify": "5.2.0",
 		"http-errors": "2.0.0",
-		"image-size": "1.1.1",
+		"image-size": "1.2.0",
 		"jose": "5.9.6",
 		"keyv": "5.2.3",
 		"nanoid": "5.0.9",
