@@ -1,30 +1,21 @@
-import type { PathValidationOptions } from './types'
-import { ValidationError } from '../../errors'
-import { ErrorCode } from '../../errors/types'
-import { PathHandler } from './path-handler'
+import type { PathValidationOptions } from '../types/path'
+import { PathHandler } from '../core/path-handler'
+import { ErrorCode, ValidationError } from '../../../errors'
 
 export class PathValidator {
-  /** Handler for path operations */
   private readonly handler: PathHandler
 
-  /**
-   * Creates an instance of PathValidator
-   */
   constructor() {
     this.handler = new PathHandler()
   }
 
   /**
-   * Validates a path according to specified options
-   * @param {string} path - The path to validate
-   * @param {PathValidationOptions} [options] - Validation options
-   * @throws {ValidationError} If the path fails validation
+   * Performs comprehensive path validation against the provided options.
+   * Throws ValidationError with appropriate message if validation fails.
    */
   public validate(path: string, options: PathValidationOptions = {}): void {
-    // Parse the path to get detailed information
     const info = this.handler.parse(path)
 
-    // Check maximum path length
     if (options.maxLength && path.length > options.maxLength) {
       throw new ValidationError(
         `Path length ${path.length} exceeds maximum length ${options.maxLength}`,
@@ -32,7 +23,6 @@ export class PathValidator {
       )
     }
 
-    // Check maximum segment length
     if (options.maxSegmentLength) {
       const longSegment = info.segments.find(
         segment => segment.value.length > options.maxSegmentLength!,
@@ -46,7 +36,6 @@ export class PathValidator {
       }
     }
 
-    // Check maximum depth (number of segments)
     if (options.maxDepth && info.segments.length > options.maxDepth) {
       throw new ValidationError(
         `Path depth ${info.segments.length} exceeds maximum depth ${options.maxDepth}`,
@@ -54,7 +43,6 @@ export class PathValidator {
       )
     }
 
-    // Check if absolute paths are allowed
     if (options.allowAbsolute === false && info.isAbsolute) {
       throw new ValidationError(
         'Absolute paths are not allowed',
@@ -62,7 +50,6 @@ export class PathValidator {
       )
     }
 
-    // Check if dot segments (. and ..) are allowed
     if (options.allowDotSegments === false) {
       const hasDotSegments = info.segments.some(
         segment => segment.isDot || segment.isDoubleDot,
@@ -75,7 +62,6 @@ export class PathValidator {
       }
     }
 
-    // Check if empty segments are allowed
     if (options.allowEmptySegments === false) {
       const hasEmptySegments = path.includes('//')
       if (hasEmptySegments) {
@@ -86,7 +72,6 @@ export class PathValidator {
       }
     }
 
-    // Check if file extension is required
     if (options.requireExtension && !info.extension) {
       throw new ValidationError(
         'File extension is required',
@@ -94,7 +79,6 @@ export class PathValidator {
       )
     }
 
-    // Check if extension is in the allowed list
     if (options.allowedExtensions && info.extension) {
       const ext = info.extension.toLowerCase()
       if (!options.allowedExtensions.includes(ext)) {
@@ -106,7 +90,6 @@ export class PathValidator {
       }
     }
 
-    // Run custom validation if provided
     if (options.customValidator && !options.customValidator(path)) {
       throw new ValidationError(
         'Path failed custom validation',
@@ -116,15 +99,12 @@ export class PathValidator {
   }
 
   /**
-   * Validates a file extension against a list of allowed extensions
-   * @param {string} path - The path to validate
-   * @param {string[]} allowedExtensions - List of allowed file extensions
-   * @throws {ValidationError} If the extension is missing or not allowed
+   * Validates that a path has one of the allowed file extensions.
+   * Throws if the path has no extension or if it's not in the allowed list.
    */
   public validateExtension(path: string, allowedExtensions: string[]): void {
     const info = this.handler.parse(path)
 
-    // Check if extension exists
     if (!info.extension) {
       throw new ValidationError(
         'File extension is required',
@@ -132,7 +112,6 @@ export class PathValidator {
       )
     }
 
-    // Check if extension is in the allowed list
     const ext = info.extension.toLowerCase()
     if (!allowedExtensions.includes(ext)) {
       throw new ValidationError(
@@ -144,10 +123,7 @@ export class PathValidator {
   }
 
   /**
-   * Validates the depth of a path
-   * @param {string} path - The path to validate
-   * @param {number} maxDepth - Maximum allowed depth
-   * @throws {ValidationError} If the path is deeper than allowed
+   * Validates that a path does not exceed the specified maximum depth.
    */
   public validateDepth(path: string, maxDepth: number): void {
     const depth = this.handler.getDepth(path)
@@ -160,10 +136,8 @@ export class PathValidator {
   }
 
   /**
-   * Validates the characters in a path against a regular expression
-   * @param {string} path - The path to validate
-   * @param {RegExp} [pattern] - Pattern of allowed characters
-   * @throws {ValidationError} If the path contains invalid characters
+   * Validates that a path contains only allowed characters.
+   * Default pattern allows alphanumeric characters, hyphens, dots, and slashes.
    */
   public validateCharacters(
     path: string,
@@ -179,10 +153,8 @@ export class PathValidator {
   }
 
   /**
-   * Validates that a path is contained within a root path
-   * @param {string} path - The path to validate
-   * @param {string} root - The root path that should contain the path
-   * @throws {ValidationError} If the path is outside the root
+   * Validates that a path is contained within a specified root directory.
+   * Prevents directory traversal attacks.
    */
   public validateWithinRoot(path: string, root: string): void {
     const normalizedPath = this.handler.normalizePath(path)
@@ -197,13 +169,8 @@ export class PathValidator {
   }
 
   /**
-   * Validates the segments of a path
-   * @param {string} path - The path to validate
-   * @param {object} [options] - Validation options
-   * @param {number} [options.minSegments] - Minimum number of segments required
-   * @param {number} [options.maxSegments] - Maximum number of segments allowed
-   * @param {RegExp} [options.segmentPattern] - Pattern for valid segment characters
-   * @throws {ValidationError} If the segments fail validation
+   * Validates path segments against constraints like minimum/maximum count
+   * and character patterns.
    */
   public validateSegments(
     path: string,
@@ -215,7 +182,6 @@ export class PathValidator {
   ): void {
     const info = this.handler.parse(path)
 
-    // Check minimum number of segments
     if (options.minSegments && info.segments.length < options.minSegments) {
       throw new ValidationError(
         `Path has ${info.segments.length} segments, `
@@ -224,7 +190,14 @@ export class PathValidator {
       )
     }
 
-    // Check the segment pattern
+    if (options.maxSegments && info.segments.length > options.maxSegments) {
+      throw new ValidationError(
+        `Path has ${info.segments.length} segments, `
+        + `maximum allowed is ${options.maxSegments}`,
+        ErrorCode.INVALID_PATH,
+      )
+    }
+
     if (options.segmentPattern) {
       const invalidSegment = info.segments.find(
         segment => !options.segmentPattern!.test(segment.value),
