@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const SpotifyURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['track', 'album', 'artist', 'playlist', 'user', 'episode', 'show']),
@@ -7,7 +7,7 @@ export const SpotifyURLSchema = BaseSpecialURLSchema.extend({
   context: z.string().optional(),
   market: z.string().optional(),
   position: z.number().optional(),
-  creator: z.string().optional()
-});
+  creator: z.string().optional(),
+})
 
-export type SpotifyURL = z.infer<typeof SpotifyURLSchema>;
+export type SpotifyURL = z.infer<typeof SpotifyURLSchema>

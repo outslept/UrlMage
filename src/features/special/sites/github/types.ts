@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const GitHubURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['repo', 'blob', 'tree', 'commit', 'issues', 'pull', 'releases', 'profile']),
@@ -12,7 +12,7 @@ export const GitHubURLSchema = BaseSpecialURLSchema.extend({
   issueNumber: z.number().optional(),
   pullNumber: z.number().optional(),
   commitHash: z.string().optional(),
-  releaseTag: z.string().optional()
-});
+  releaseTag: z.string().optional(),
+})
 
-export type GitHubURL = z.infer<typeof GitHubURLSchema>;
+export type GitHubURL = z.infer<typeof GitHubURLSchema>

@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const PlayMarketURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['app', 'developer', 'collection', 'search', 'movies', 'books', 'music']),
@@ -12,7 +12,7 @@ export const PlayMarketURLSchema = BaseSpecialURLSchema.extend({
   price: z.string().optional(),
   language: z.string().optional(),
   country: z.string().optional(),
-  reviewId: z.string().optional()
-});
+  reviewId: z.string().optional(),
+})
 
-export type PlayMarketURL = z.infer<typeof PlayMarketURLSchema>;
+export type PlayMarketURL = z.infer<typeof PlayMarketURLSchema>

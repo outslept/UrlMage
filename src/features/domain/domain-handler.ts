@@ -1,18 +1,28 @@
-import { z } from 'zod';
-import { DomainInfo, DomainPart, IpAddress } from './types';
-import { isIP } from 'net';
-import { parseDomain, ParseResultType } from 'parse-domain';
-import { ValidationError } from '../../errors';
+import type { DomainInfo, DomainPart, IpAddress } from './types'
+import { isIP } from 'node:net'
+import punycode from 'node:punycode'
+import { parseDomain, ParseResultType } from 'parse-domain'
+import { ValidationError } from '../../errors'
+import { ErrorCode } from '../../errors/types'
 
+/**
+ * Utility class for domain name handling, parsing, and manipulation
+ * @class DomainHandler
+ */
 export class DomainHandler {
   /**
-   * Parse a domain string into its constituent parts
+   * Parses a domain string into structured information
+   * @param {string} domain - The domain to parse
+   * @returns {DomainInfo} Structured information about the domain
+   * @throws {ValidationError} If the domain is invalid
    */
   public parse(domain: string): DomainInfo {
-    // Remove protocol and path if present
-    domain = domain.replace(/^[a-zA-Z]+:\/\//, '').split('/')[0];
-    
-    // Check if it's an IP address
+    // Remove protocol if present
+    domain = domain.replace(/^[a-z]+:\/\//i, '')
+
+    // Remove path, query parameters, and hash
+    domain = domain.split(/[/?#]/)[0]
+
     if (isIP(domain)) {
       return {
         fullDomain: domain,
@@ -20,70 +30,82 @@ export class DomainHandler {
         tld: '',
         isIp: true,
         isLocal: this.isPrivateIP(domain) || this.isLoopbackIP(domain),
-        isValid: true
-      };
+        isValid: true,
+      }
     }
 
-    const parseResult = parseDomain(domain);
-    
+    const parseResult = parseDomain(domain)
+
     if (!parseResult || parseResult.type === ParseResultType.Invalid) {
-      throw new ValidationError(`Invalid domain: ${domain}`);
+      throw new ValidationError(
+        `Invalid domain: ${domain}`,
+        ErrorCode.INVALID_HOSTNAME,
+      )
     }
 
     if (parseResult.type === ParseResultType.NotListed) {
-      // Handle local domains
       return {
         fullDomain: domain,
-        parts: [{ name: domain, level: 0, isPublicSuffix: false, isRegistrable: true }],
+        parts: [
+          {
+            name: domain,
+            level: 0,
+            isPublicSuffix: false,
+            isRegistrable: true,
+          },
+        ],
         tld: '',
         isIp: false,
         isLocal: true,
-        isValid: true
-      };
+        isValid: true,
+      }
     }
 
     if (parseResult.type !== ParseResultType.Listed) {
-      throw new ValidationError(`Invalid domain type: ${parseResult.type}`);
+      throw new ValidationError(
+        `Invalid domain type: ${parseResult.type}`,
+        ErrorCode.INVALID_HOSTNAME,
+      )
     }
 
-    const { subDomains, domain: sld, topLevelDomains } = parseResult;
-    const tld = topLevelDomains ? topLevelDomains.join('.') : '';
+    const { subDomains, domain: sld, topLevelDomains } = parseResult
+    const tld = topLevelDomains ? topLevelDomains.join('.') : ''
 
     if (!sld) {
-      throw new ValidationError(`Invalid domain structure: ${domain}`);
+      throw new ValidationError(
+        `Invalid domain structure: ${domain}`,
+        ErrorCode.INVALID_HOSTNAME,
+      )
     }
 
-    const parts: DomainPart[] = [];
-    let level = 0;
+    const parts: DomainPart[] = []
+    let level = 0
 
-    // Add subdomains
     if (subDomains && subDomains.length > 0) {
-      [...subDomains].reverse().forEach(sub => {
+      [...subDomains].reverse().forEach((sub) => {
         parts.push({
           name: sub,
           level: level++,
           isPublicSuffix: false,
-          isRegistrable: false
-        });
-      });
+          isRegistrable: false,
+        })
+      })
     }
 
-    // Add SLD
     parts.push({
       name: sld,
       level: level++,
       isPublicSuffix: false,
-      isRegistrable: true
-    });
+      isRegistrable: true,
+    })
 
-    // Add TLD
     if (tld) {
       parts.push({
         name: tld,
-        level: level,
+        level,
         isPublicSuffix: true,
-        isRegistrable: false
-      });
+        isRegistrable: false,
+      })
     }
 
     return {
@@ -91,20 +113,27 @@ export class DomainHandler {
       parts,
       tld: tld || '',
       sld,
-      subdomain: subDomains && subDomains.length > 0 ? subDomains.join('.') : undefined,
+      subdomain:
+        subDomains && subDomains.length > 0 ? subDomains.join('.') : undefined,
       isIp: false,
       isLocal: false,
-      isValid: true
-    };
+      isValid: true,
+    }
   }
 
   /**
-   * Parse an IP address string
+   * Parses an IP address string into structured information
+   * @param {string} ip - The IP address to parse
+   * @returns {IpAddress} Structured information about the IP address
+   * @throws {ValidationError} If the IP address is invalid
    */
   public parseIP(ip: string): IpAddress {
-    const version = isIP(ip);
+    const version = isIP(ip)
     if (!version) {
-      throw new ValidationError(`Invalid IP address: ${ip}`);
+      throw new ValidationError(
+        `Invalid IP address: ${ip}`,
+        ErrorCode.INVALID_IP,
+      )
     }
 
     return {
@@ -112,196 +141,350 @@ export class DomainHandler {
       version: version === 4 ? 'v4' : 'v6',
       isPrivate: this.isPrivateIP(ip),
       isLoopback: this.isLoopbackIP(ip),
-      isMulticast: this.isMulticastIP(ip)
-    };
+      isMulticast: this.isMulticastIP(ip),
+    }
   }
 
   /**
-   * Normalize a domain name
+   * Normalizes a domain name (removes protocol, path, converts to lowercase)
+   * @param {string} domain - The domain to normalize
+   * @returns {string} The normalized domain
    */
   public normalize(domain: string): string {
-    // Remove protocol and path if present
-    domain = domain.replace(/^[a-zA-Z]+:\/\//, '').split('/')[0];
-    
+    // Remove protocol if present
+    domain = domain.replace(/^[a-z]+:\/\//i, '')
+
+    // Remove path, query parameters, and hash
+    domain = domain.split(/[/?#]/)[0]
+
     // Convert to lowercase
-    domain = domain.toLowerCase();
-    
+    domain = domain.toLowerCase()
+
     // Remove trailing dot
-    domain = domain.replace(/\.$/, '');
-    
-    // Punycode conversion for IDN
+    domain = domain.replace(/\.$/, '')
+
     try {
-      const url = new URL(`http://${domain}`);
-      return url.hostname;
-    } catch {
-      return domain;
+      const url = new URL(`http://${domain}`)
+      return url.hostname
+    }
+    catch {
+      return domain
     }
   }
 
   /**
-   * Get the root domain (TLD + SLD) from a domain string
+   * Extracts the root domain (registrable part + TLD) from a domain
+   * @param {string} domain - The domain to process
+   * @returns {string} The root domain
    */
   public getRootDomain(domain: string): string {
-    const info = this.parse(domain);
+    const info = this.parse(domain)
     if (info.isIp) {
-      return domain;
+      return domain
     }
 
-    const registrablePart = info.parts.find(part => part.isRegistrable);
-    const tldPart = info.parts.find(part => part.isPublicSuffix);
+    const registrablePart = info.parts.find(part => part.isRegistrable)
+    const tldPart = info.parts.find(part => part.isPublicSuffix)
 
     if (!registrablePart || !tldPart) {
-      return domain;
+      return domain
     }
 
-    return `${registrablePart.name}.${tldPart.name}`;
+    return `${registrablePart.name}.${tldPart.name}`
   }
 
   /**
-   * Get all subdomains from a domain
+   * Gets an array of subdomain parts from a domain
+   * @param {string} domain - The domain to process
+   * @returns {string[]} Array of subdomain parts
    */
   public getSubdomains(domain: string): string[] {
-    const info = this.parse(domain);
+    const info = this.parse(domain)
     if (info.isIp) {
-      return [];
+      return []
     }
     return info.parts
       .filter(part => !part.isPublicSuffix && !part.isRegistrable)
-      .map(part => part.name);
+      .map(part => part.name)
   }
 
   /**
-   * Add a subdomain to a domain
+   * Adds a subdomain to a domain
+   * @param {string} domain - The domain to add the subdomain to
+   * @param {string} subdomain - The subdomain to add
+   * @returns {string} The resulting domain with subdomain
+   * @throws {ValidationError} If the operation is invalid or the subdomain format is incorrect
    */
   public addSubdomain(domain: string, subdomain: string): string {
-    const info = this.parse(domain);
+    const info = this.parse(domain)
     if (info.isIp) {
-      throw new ValidationError('Cannot add subdomain to IP address');
-    }
-
-    // Validate subdomain
-    if (!/^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(subdomain)) {
       throw new ValidationError(
-        'Invalid subdomain. Must start and end with alphanumeric characters and can contain hyphens in between.'
-      );
+        'Cannot add subdomain to IP address',
+        ErrorCode.INVALID_OPERATION,
+      )
     }
 
-    return `${subdomain}.${domain}`;
+    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/i.test(subdomain)) {
+      throw new ValidationError(
+        'Invalid subdomain. Must start and end with alphanumeric characters and can contain hyphens in between.',
+        ErrorCode.INVALID_HOSTNAME,
+      )
+    }
+
+    return `${subdomain}.${domain}`
   }
 
   /**
-   * Remove the leftmost subdomain from a domain
+   * Removes the leftmost subdomain from a domain
+   * @param {string} domain - The domain to process
+   * @returns {string} The domain with the leftmost subdomain removed
    */
   public removeSubdomain(domain: string): string {
-    const info = this.parse(domain);
+    const info = this.parse(domain)
     if (info.isIp) {
-      return domain;
+      return domain
     }
 
-    const parts = info.parts;
-    if (parts.length <= 2) { // Only TLD and SLD
-      return domain;
+    const parts = info.parts
+    if (parts.length <= 2) {
+      return domain
     }
 
     return parts
-      .slice(1) // Remove first subdomain
+      .slice(1)
       .map(part => part.name)
-      .join('.');
+      .join('.')
   }
 
   /**
-   * Replace all subdomains with a new one
+   * Replaces all subdomains in a domain with a new subdomain
+   * @param {string} domain - The domain to process
+   * @param {string} newSubdomain - The new subdomain to set
+   * @returns {string} The domain with replaced subdomains
+   * @throws {ValidationError} If the operation is invalid
    */
   public replaceSubdomains(domain: string, newSubdomain: string): string {
-    const info = this.parse(domain);
+    const info = this.parse(domain)
     if (info.isIp) {
-      throw new ValidationError('Cannot replace subdomains in IP address');
+      throw new ValidationError(
+        'Cannot replace subdomains in IP address',
+        ErrorCode.INVALID_OPERATION,
+      )
     }
 
-    const rootDomain = this.getRootDomain(domain);
-    return this.addSubdomain(rootDomain, newSubdomain);
+    const rootDomain = this.getRootDomain(domain)
+    return this.addSubdomain(rootDomain, newSubdomain)
   }
 
   /**
-   * Get subdomain level (depth)
+   * Gets the depth of subdomains in a domain
+   * @param {string} domain - The domain to analyze
+   * @returns {number} The number of subdomain levels
    */
   public getSubdomainDepth(domain: string): number {
-    return this.getSubdomains(domain).length;
+    return this.getSubdomains(domain).length
   }
 
   /**
-   * Check if one domain is a subdomain of another
+   * Checks if a domain is a subdomain of another domain
+   * @param {string} domain - The potential subdomain
+   * @param {string} parentDomain - The potential parent domain
+   * @returns {boolean} True if domain is a subdomain of parentDomain
    */
   public isSubdomainOf(domain: string, parentDomain: string): boolean {
-    const domainInfo = this.parse(domain);
-    const parentInfo = this.parse(parentDomain);
+    const domainInfo = this.parse(domain)
+    const parentInfo = this.parse(parentDomain)
 
     if (domainInfo.isIp || parentInfo.isIp) {
-      return false;
+      return false
     }
 
-    const domainRoot = this.getRootDomain(domain);
-    const parentRoot = this.getRootDomain(parentDomain);
+    const domainRoot = this.getRootDomain(domain)
+    const parentRoot = this.getRootDomain(parentDomain)
 
-    // First check if they share the same root domain
     if (domainRoot !== parentRoot) {
-      return false;
+      return false
     }
 
-    // Get subdomains for both
-    const domainSubs = this.getSubdomains(domain);
-    const parentSubs = this.getSubdomains(parentDomain);
+    const domainSubs = this.getSubdomains(domain)
+    const parentSubs = this.getSubdomains(parentDomain)
 
-    // Domain must have more subdomains than parent
     if (domainSubs.length <= parentSubs.length) {
-      return false;
+      return false
     }
 
-    // Check if parent's subdomains match the end of domain's subdomains
-    const domainSubStr = domainSubs.join('.');
-    const parentSubStr = parentSubs.join('.');
-
-    return domainSubStr.endsWith(parentSubStr);
+    // Check if domain ends with the parent domain
+    return domain.endsWith(`.${parentDomain}`)
   }
 
   /**
-   * Check if IP is private
+   * Converts a domain to Punycode for internationalized domain names (IDN)
+   * @param {string} domain - The Unicode domain to convert
+   * @returns {string} The Punycode-encoded domain
+   * @throws {ValidationError} If conversion fails
+   */
+  public toPunycode(domain: string): string {
+    try {
+      // Split domain into parts
+      const parts = domain.split('.')
+
+      // Convert each part to punycode if necessary
+      const punycodeparts = parts.map((part) => {
+        // Check if part contains non-ASCII characters
+        if (/[^\x00-\x7F]/.test(part)) {
+          return `xn--${punycode.encode(part)}`
+        }
+        return part
+      })
+
+      return punycodeparts.join('.')
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        throw new ValidationError(
+          `Failed to convert to Punycode: ${error.message}`,
+          ErrorCode.ENCODING_ERROR,
+        )
+      }
+      throw new ValidationError(
+        'Failed to convert to Punycode: Unknown error',
+        ErrorCode.ENCODING_ERROR,
+      )
+    }
+  }
+
+  /**
+   * Converts a Punycode domain back to Unicode
+   * @param {string} domain - The Punycode domain to convert
+   * @returns {string} The Unicode domain
+   * @throws {ValidationError} If conversion fails
+   */
+  public fromPunycode(domain: string): string {
+    try {
+      // Split domain into parts
+      const parts = domain.split('.')
+
+      // Convert each part from punycode if necessary
+      const unicodeParts = parts.map((part) => {
+        if (part.startsWith('xn--')) {
+          return punycode.decode(part.slice(4))
+        }
+        return part
+      })
+
+      return unicodeParts.join('.')
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        throw new ValidationError(
+          `Failed to convert from Punycode: ${error.message}`,
+          ErrorCode.DECODING_ERROR,
+        )
+      }
+      throw new ValidationError(
+        'Failed to convert from Punycode: Unknown error',
+        ErrorCode.DECODING_ERROR,
+      )
+    }
+  }
+
+  /**
+   * Checks if an IP address is private
+   * @param {string} ip - The IP address to check
+   * @returns {boolean} True if the IP is private
+   * @private
    */
   private isPrivateIP(ip: string): boolean {
-    const addr = this.parseIPv4(ip);
-    if (!addr) return false;
+    const version = isIP(ip)
+    if (version === 0)
+      return false
 
-    return (
-      (addr[0] === 10) ||
-      (addr[0] === 172 && addr[1] >= 16 && addr[1] <= 31) ||
-      (addr[0] === 192 && addr[1] === 168)
-    );
+    if (version === 4) {
+      const addr = this.parseIPv4(ip)
+      if (!addr)
+        return false
+
+      return (
+        addr[0] === 10 // 10.0.0.0/8
+        || (addr[0] === 172 && addr[1] >= 16 && addr[1] <= 31) // 172.16.0.0/12
+        || (addr[0] === 192 && addr[1] === 168) // 192.168.0.0/16
+        || (addr[0] === 169 && addr[1] === 254) // 169.254.0.0/16 (link-local)
+      )
+    }
+
+    if (version === 6) {
+      // Check for IPv6 local addresses (fe80::/10)
+      return (
+        ip.toLowerCase().startsWith('fe80:')
+        || ip.toLowerCase().startsWith('fc00:')
+        || ip.toLowerCase().startsWith('fd00:')
+      )
+    }
+
+    return false
   }
 
   /**
-   * Check if IP is loopback
+   * Checks if an IP address is a loopback address
+   * @param {string} ip - The IP address to check
+   * @returns {boolean} True if the IP is a loopback address
+   * @private
    */
   private isLoopbackIP(ip: string): boolean {
-    const addr = this.parseIPv4(ip);
-    if (!addr) return false;
+    const version = isIP(ip)
+    if (version === 0)
+      return false
 
-    return addr[0] === 127;
+    if (version === 4) {
+      const addr = this.parseIPv4(ip)
+      if (!addr)
+        return false
+      return addr[0] === 127
+    }
+
+    if (version === 6) {
+      // ::1 - IPv6 loopback
+      return ip === '::1'
+    }
+
+    return false
   }
 
   /**
-   * Check if IP is multicast
+   * Checks if an IP address is a multicast address
+   * @param {string} ip - The IP address to check
+   * @returns {boolean} True if the IP is a multicast address
+   * @private
    */
   private isMulticastIP(ip: string): boolean {
-    const addr = this.parseIPv4(ip);
-    if (!addr) return false;
-    return addr[0] >= 224 && addr[0] <= 239;
+    const version = isIP(ip)
+    if (version === 0)
+      return false
+
+    if (version === 4) {
+      const addr = this.parseIPv4(ip)
+      if (!addr)
+        return false
+      return addr[0] >= 224 && addr[0] <= 239
+    }
+
+    if (version === 6) {
+      // IPv6 multicast addresses start with ff00::/8
+      return ip.toLowerCase().startsWith('ff')
+    }
+
+    return false
   }
 
   /**
-   * Parse IPv4 address into octets
+   * Parses an IPv4 address into its numeric components
+   * @param {string} ip - The IPv4 address to parse
+   * @returns {number[] | null} Array of numeric components or null if invalid
+   * @private
    */
   private parseIPv4(ip: string): number[] | null {
-    if (!isIP(ip) || isIP(ip) === 6) return null;
-    return ip.split('.').map(Number);
+    if (isIP(ip) !== 4)
+      return null
+    return ip.split('.').map(Number)
   }
 }

@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const WhatsAppURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['chat', 'group', 'catalog', 'status', 'send', 'share']),
@@ -9,7 +9,7 @@ export const WhatsAppURLSchema = BaseSpecialURLSchema.extend({
   statusId: z.string().optional(),
   text: z.string().optional(),
   shareText: z.string().optional(),
-  shareUrl: z.string().optional()
-});
+  shareUrl: z.string().optional(),
+})
 
-export type WhatsAppURL = z.infer<typeof WhatsAppURLSchema>;
+export type WhatsAppURL = z.infer<typeof WhatsAppURLSchema>

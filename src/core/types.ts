@@ -22,7 +22,7 @@ export const URLValidationOptionsSchema = z.object({
   customValidation: z.function()
     .args(z.string())
     .returns(z.boolean())
-    .optional()
+    .optional(),
 })
 
 // Query Parameter Schemas
@@ -31,7 +31,7 @@ export const QueryValueSchema = z.union([
   z.number(),
   z.boolean(),
   z.null(),
-  z.array(z.union([z.string(), z.number(), z.boolean()]))
+  z.array(z.union([z.string(), z.number(), z.boolean()])),
 ])
 
 export const QueryParamsSchema = z.record(z.string(), QueryValueSchema)
@@ -45,7 +45,7 @@ export const URLComponentsSchema = z.object({
   search: SearchSchema,
   hash: HashSchema,
   username: z.string().optional(),
-  password: z.string().optional()
+  password: z.string().optional(),
 })
 
 // Pattern Matching Schema
@@ -54,7 +54,7 @@ export const URLPatternSchema = z.object({
   hostname: z.string().optional(),
   pathname: z.string().optional(),
   search: z.string().optional(),
-  hash: z.string().optional()
+  hash: z.string().optional(),
 })
 
 // Export inferred types
@@ -77,22 +77,22 @@ export const URLErrorSchema = z.object({
     'INVALID_CREDENTIALS',
     'URL_TOO_LONG',
     'MALICIOUS_URL',
-    'CUSTOM_VALIDATION_FAILED'
+    'CUSTOM_VALIDATION_FAILED',
   ]),
   message: z.string(),
-  details: z.record(z.string(), z.unknown()).optional()
+  details: z.record(z.string(), z.unknown()).optional(),
 })
 
 export type URLError = z.infer<typeof URLErrorSchema>
 
 // Utility type for builder pattern
-export type URLBuilder = {
-  setProtocol(protocol: Protocol): URLBuilder
-  setHostname(hostname: string): URLBuilder
-  setPort(port: string | number): URLBuilder
-  setPath(path: string): URLBuilder
-  setSearch(search: string | QueryParams): URLBuilder
-  setHash(hash: string): URLBuilder
-  setCredentials(username: string, password: string): URLBuilder
-  build(): URL
+export interface URLBuilder {
+  setProtocol: (protocol: Protocol) => URLBuilder
+  setHostname: (hostname: string) => URLBuilder
+  setPort: (port: string | number) => URLBuilder
+  setPath: (path: string) => URLBuilder
+  setSearch: (search: string | QueryParams) => URLBuilder
+  setHash: (hash: string) => URLBuilder
+  setCredentials: (username: string, password: string) => URLBuilder
+  build: () => URL
 }

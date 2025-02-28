@@ -1,257 +1,282 @@
-import { ProtocolInfo, ProtocolSecurity, ProtocolCapabilities } from './types';
-import { ValidationError } from '../../errors';
+import type {
+  ProtocolCapabilities,
+  ProtocolFullInfo,
+  ProtocolSecurity,
+} from './types'
+import { ValidationError } from '../../errors'
+import { ErrorCode } from '../../errors/types'
+import { ProtocolRegistry } from './protocol-registry'
+import {
+  ProtocolCategory,
+} from './types'
 
+/**
+ * Utility class for handling and processing URL protocols
+ * @class ProtocolHandler
+ */
 export class ProtocolHandler {
-  private static readonly DEFAULT_PORTS: Record<string, number> = {
-    http: 80,
-    https: 443,
-    ftp: 21,
-    sftp: 22,
-    ssh: 22,
-    telnet: 23,
-    smtp: 25,
-    smtps: 465,
-    imap: 143,
-    imaps: 993,
-    pop3: 110,
-    pop3s: 995,
-    ldap: 389,
-    ldaps: 636,
-    mongodb: 27017,
-    redis: 6379,
-    mysql: 3306,
-    postgresql: 5432,
-    amqp: 5672,
-    mqtt: 1883,
-    ws: 80,
-    wss: 443
-  };
+  /**
+   * Parses a protocol string and returns detailed information
+   * @param {string} protocol - The protocol to parse
+   * @returns {ProtocolFullInfo} Detailed information about the protocol
+   * @throws {ValidationError} If the protocol format is invalid
+   */
+  public parse(protocol: string): ProtocolFullInfo {
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
 
-  private static readonly SECURE_PROTOCOLS = new Set([
-    'https',
-    'sftp',
-    'smtps',
-    'imaps',
-    'pop3s',
-    'ldaps',
-    'wss'
-  ]);
+    if (!this.isValid(normalizedProtocol)) {
+      throw new ValidationError(
+        `Invalid protocol format: ${protocol}`,
+        ErrorCode.INVALID_PROTOCOL,
+      )
+    }
+
+    try {
+      return ProtocolRegistry.getProtocol(normalizedProtocol)
+    }
+    catch (error) {
+      // If protocol is not found in registry, create basic information
+      return this.createGenericProtocolInfo(normalizedProtocol)
+    }
+  }
 
   /**
-   * Parse and validate a protocol string
+   * Checks if a protocol has a valid format
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol has a valid format
    */
-  public parse(protocol: string): ProtocolInfo {
-    // Remove trailing colons and slashes
-    protocol = protocol.toLowerCase().replace(/[:\/]+$/, '');
+  public isValid(protocol: string): boolean {
+    return /^[a-z][a-z0-9+.-]*$/.test(protocol)
+  }
 
-    if (!this.isValid(protocol)) {
-      throw new ValidationError(`Invalid protocol: ${protocol}`);
+  /**
+   * Checks if a protocol is secure
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is secure
+   */
+  public isSecure(protocol: string): boolean {
+    return ProtocolRegistry.isSecure(protocol)
+  }
+
+  /**
+   * Gets the default port for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {number | undefined} The default port or undefined if none
+   */
+  public getDefaultPort(protocol: string): number | undefined {
+    return ProtocolRegistry.getDefaultPort(protocol)
+  }
+
+  /**
+   * Gets a list of allowed ports for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {number[]} Array of allowed port numbers
+   */
+  public getAllowedPorts(protocol: string): number[] {
+    try {
+      const protocolInfo = this.parse(protocol)
+      return protocolInfo.allowedPorts || []
     }
+    catch (error) {
+      return []
+    }
+  }
+
+  /**
+   * Checks if a protocol requires a host
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol requires a host
+   */
+  public requiresHost(protocol: string): boolean {
+    return ProtocolRegistry.requiresHost(protocol)
+  }
+
+  /**
+   * Checks if a protocol supports authentication
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol supports authentication
+   */
+  public supportsAuth(protocol: string): boolean {
+    return ProtocolRegistry.supportsAuth(protocol)
+  }
+
+  /**
+   * Gets the category of a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {string} The protocol category
+   */
+  public getCategory(protocol: string): string {
+    try {
+      const protocolInfo = this.parse(protocol)
+      return protocolInfo.category
+    }
+    catch (error) {
+      return 'other'
+    }
+  }
+
+  /**
+   * Gets security information for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {ProtocolSecurity} Security information for the protocol
+   */
+  public getSecurity(protocol: string): ProtocolSecurity {
+    try {
+      const protocolInfo = this.parse(protocol)
+      return protocolInfo.security
+    }
+    catch (error) {
+      // For unknown protocols, assume they are insecure
+      return {
+        encrypted: false,
+        warnings: ['Unknown protocol security properties'],
+      }
+    }
+  }
+
+  /**
+   * Gets capability information for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {ProtocolCapabilities} Capability information for the protocol
+   */
+  public getCapabilities(protocol: string): ProtocolCapabilities {
+    try {
+      const protocolInfo = this.parse(protocol)
+      return protocolInfo.capabilities
+    }
+    catch (error) {
+      // For unknown protocols, provide basic capabilities
+      return {
+        supportsStreaming: false,
+        supportsCompression: false,
+        supportsProxy: false,
+        requiresAuthentication: false,
+      }
+    }
+  }
+
+  /**
+   * Creates basic information for unknown protocols
+   * @param {string} protocol - The protocol to create information for
+   * @returns {ProtocolFullInfo} Basic protocol information
+   * @private
+   */
+  private createGenericProtocolInfo(protocol: string): ProtocolFullInfo {
+    // Determine if protocol is secure based on 's' suffix
+    const isSecure = protocol.endsWith('s')
 
     return {
       name: protocol,
-      secure: this.isSecure(protocol),
-      defaultPort: this.getDefaultPort(protocol),
-      allowedPorts: this.getAllowedPorts(protocol),
-      requiresHost: this.requiresHost(protocol),
-      supportsAuth: this.supportsAuth(protocol),
-      category: this.getCategory(protocol)
-    };
-  }
-
-  /**
-   * Check if a protocol is valid
-   */
-  public isValid(protocol: string): boolean {
-    // Basic protocol format validation
-    return /^[a-z][a-z0-9+.-]*$/.test(protocol);
-  }
-
-  /**
-   * Check if a protocol is secure
-   */
-  public isSecure(protocol: string): boolean {
-    return ProtocolHandler.SECURE_PROTOCOLS.has(protocol) ||
-           protocol.endsWith('s');
-  }
-
-  /**
-   * Get default port for a protocol
-   */
-  public getDefaultPort(protocol: string): number | undefined {
-    return ProtocolHandler.DEFAULT_PORTS[protocol];
-  }
-
-  /**
-   * Get allowed ports for a protocol
-   */
-  public getAllowedPorts(protocol: string): number[] {
-    const defaultPort = this.getDefaultPort(protocol);
-    if (!defaultPort) {
-      return [];
+      secure: isSecure,
+      defaultPort: undefined,
+      allowedPorts: [],
+      requiresHost: true,
+      supportsAuth: false,
+      category: ProtocolCategory.OTHER,
+      security: {
+        encrypted: isSecure,
+        warnings: isSecure ? [] : ['Protocol may not use encryption'],
+      },
+      capabilities: {
+        supportsStreaming: false,
+        supportsCompression: false,
+        supportsProxy: false,
+        requiresAuthentication: false,
+      },
     }
-    
-    // Some protocols have alternative ports
-    const alternativePorts: Record<string, number[]> = {
-      http: [8080, 8000, 3000],
-      https: [8443, 4443],
-      mongodb: [27018, 27019],
-      postgresql: [5433]
-    };
-
-    return [defaultPort, ...(alternativePorts[protocol] || [])];
   }
 
   /**
-   * Check if protocol requires a host
+   * Checks if a protocol is a standard protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is standard
    */
-  public requiresHost(protocol: string): boolean {
-    const noHostProtocols = new Set([
-      'file',
-      'data',
-      'about',
-      'javascript',
-      'mailto'
-    ]);
-    return !noHostProtocols.has(protocol);
+  public isStandardProtocol(protocol: string): boolean {
+    return ProtocolRegistry.hasProtocol(protocol)
   }
 
   /**
-   * Check if protocol supports authentication
+   * Gets a secure alternative for an insecure protocol
+   * @param {string} protocol - The protocol to find an alternative for
+   * @returns {string | undefined} The secure alternative or undefined if none
    */
-  public supportsAuth(protocol: string): boolean {
-    const authProtocols = new Set([
-      'http',
+  public getSecureAlternative(protocol: string): string | undefined {
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+
+    const alternatives: Record<string, string> = {
+      http: 'https',
+      ws: 'wss',
+      ftp: 'sftp',
+      smtp: 'smtps',
+      imap: 'imaps',
+      pop3: 'pop3s',
+      ldap: 'ldaps',
+    }
+
+    return alternatives[normalizedProtocol]
+  }
+
+  /**
+   * Checks if a protocol supports a specific usage
+   * @param {string} protocol - The protocol to check
+   * @param {"browsing" | "download" | "upload" | "streaming" | "messaging"} usage - The usage to check
+   * @returns {boolean} True if the protocol supports the usage
+   */
+  public supportsUsage(
+    protocol: string,
+    usage: 'browsing' | 'download' | 'upload' | 'streaming' | 'messaging',
+  ): boolean {
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+
+    // Define which protocols support which usage types
+    const usageMap: Record<string, string[]> = {
+      browsing: ['http', 'https', 'file'],
+      download: ['http', 'https', 'ftp', 'sftp', 'file'],
+      upload: ['http', 'https', 'ftp', 'sftp'],
+      streaming: ['http', 'https', 'ws', 'wss', 'rtmp', 'rtsp'],
+      messaging: ['ws', 'wss', 'mqtt', 'amqp'],
+    }
+
+    return usageMap[usage]?.includes(normalizedProtocol) || false
+  }
+
+  /**
+   * Checks if a protocol requires a secure connection
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol requires a secure connection
+   */
+  public requiresSecureConnection(protocol: string): boolean {
+    // Some protocols should always be used with a secure connection
+    const secureOnlyProtocols = [
       'https',
-      'ftp',
+      'wss',
       'sftp',
-      'ssh',
-      'smtp',
       'smtps',
-      'imap',
       'imaps',
-      'pop3',
       'pop3s',
-      'ldap',
       'ldaps',
-      'mongodb',
-      'redis',
-      'mysql',
-      'postgresql'
-    ]);
-    return authProtocols.has(protocol);
+    ]
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+
+    return secureOnlyProtocols.includes(normalizedProtocol)
   }
 
   /**
-   * Get protocol category
+   * Gets all supported protocols for a specific category
+   * @param {string} category - The category to get protocols for
+   * @returns {string[]} Array of protocol names in the category
    */
-  public getCategory(protocol: string): 'web' | 'mail' | 'file' | 'media' | 'messaging' | 'other' {
-    const categories: Record<string, 'web' | 'mail' | 'file' | 'media' | 'messaging' | 'other'> = {
-      http: 'web',
-      https: 'web',
-      ftp: 'file',
-      sftp: 'file',
-      file: 'file',
-      mailto: 'mail',
-      smtp: 'mail',
-      smtps: 'mail',
-      imap: 'mail',
-      imaps: 'mail',
-      pop3: 'mail',
-      pop3s: 'mail',
-      rtmp: 'media',
-      rtsp: 'media',
-      ws: 'messaging',
-      wss: 'messaging',
-      mqtt: 'messaging',
-      amqp: 'messaging'
-    };
-
-    return categories[protocol] || 'other';
+  public getProtocolsForCategory(category: string): string[] {
+    return ProtocolRegistry.getProtocolsByCategory(category as any).map(
+      p => p.name,
+    )
   }
 
   /**
-   * Get security information for a protocol
+   * Gets all secure protocols
+   * @returns {string[]} Array of secure protocol names
    */
-  public getSecurity(protocol: string): ProtocolSecurity {
-    const info = this.parse(protocol);
-
-    return {
-      encrypted: info.secure,
-      tlsVersion: info.secure ? 'TLS 1.3' : undefined,
-      certificates: info.secure ? [] : undefined,
-      ciphers: info.secure ? ['TLS_AES_256_GCM_SHA384', 'TLS_CHACHA20_POLY1305_SHA256'] : undefined,
-      warnings: this.getSecurityWarnings(protocol)
-    };
-  }
-
-  /**
-   * Get capabilities for a protocol
-   */
-  public getCapabilities(protocol: string): ProtocolCapabilities {
-    const info = this.parse(protocol);
-
-    return {
-      supportsStreaming: this.supportsStreaming(protocol),
-      supportsCompression: this.supportsCompression(protocol),
-      supportsProxy: this.supportsProxy(protocol),
-      requiresAuthentication: this.requiresAuthentication(protocol),
-      maxRequestSize: this.getMaxRequestSize(protocol),
-      timeout: this.getDefaultTimeout(protocol)
-    };
-  }
-
-  private supportsStreaming(protocol: string): boolean {
-    return new Set(['http', 'https', 'ws', 'wss', 'rtmp', 'rtsp']).has(protocol);
-  }
-
-  private supportsCompression(protocol: string): boolean {
-    return new Set(['http', 'https', 'ws', 'wss']).has(protocol);
-  }
-
-  private supportsProxy(protocol: string): boolean {
-    return new Set(['http', 'https', 'ftp', 'ws', 'wss']).has(protocol);
-  }
-
-  private requiresAuthentication(protocol: string): boolean {
-    return new Set(['sftp', 'ssh', 'smtps', 'imaps', 'pop3s', 'ldaps']).has(protocol);
-  }
-
-  private getMaxRequestSize(protocol: string): number | undefined {
-    const sizes: Record<string, number> = {
-      http: 2 * 1024 * 1024, // 2MB
-      https: 2 * 1024 * 1024,
-      ftp: 10 * 1024 * 1024 * 1024, // 10GB
-      smtp: 25 * 1024 * 1024 // 25MB
-    };
-    return sizes[protocol];
-  }
-
-  private getDefaultTimeout(protocol: string): number | undefined {
-    const timeouts: Record<string, number> = {
-      http: 30000, // 30 seconds
-      https: 30000,
-      ftp: 120000, // 2 minutes
-      smtp: 300000 // 5 minutes
-    };
-    return timeouts[protocol];
-  }
-
-  private getSecurityWarnings(protocol: string): string[] {
-    const warnings: string[] = [];
-
-    if (!this.isSecure(protocol)) {
-      warnings.push('Protocol does not use encryption');
-    }
-
-    if (protocol === 'ftp' || protocol === 'telnet') {
-      warnings.push('Protocol sends credentials in plaintext');
-    }
-
-    if (protocol === 'http') {
-      warnings.push('Consider using HTTPS for secure communication');
-    }
-
-    return warnings;
+  public getSecureProtocols(): string[] {
+    return ProtocolRegistry.getSecureProtocols().map(p => p.name)
   }
 }

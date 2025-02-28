@@ -1,154 +1,289 @@
-import { z } from 'zod';
-import { ValidationError } from '../../errors';
-import { ProtocolInfo } from './types';
-import { ProtocolHandler } from './protocol-handler';
+import { ValidationError } from '../../errors'
+import { ErrorCode } from '../../errors/types'
+import { ProtocolHandler } from './protocol-handler'
+import { ProtocolRegistry } from './protocol-registry'
 
 /**
- * Protocol validation rules
+ * Class for validating URL protocols against security and format requirements
+ * @class ProtocolValidator
  */
 export class ProtocolValidator {
-  private handler: ProtocolHandler;
+  /** Handler for protocol operations */
+  private handler: ProtocolHandler
 
+  /**
+   * Creates an instance of ProtocolValidator
+   */
   constructor() {
-    this.handler = new ProtocolHandler();
+    this.handler = new ProtocolHandler()
   }
 
   /**
-   * Validate protocol string
+   * Validates a protocol string
+   * @param {string} protocol - The protocol to validate
+   * @throws {ValidationError} If the protocol is invalid
    */
   public validate(protocol: string): void {
-    // Basic protocol format validation
     if (!protocol) {
-      throw new ValidationError('Protocol is required');
+      throw new ValidationError(
+        'Protocol is required',
+        ErrorCode.INVALID_PROTOCOL,
+      )
     }
 
-    if (!this.handler.isValid(protocol)) {
-      throw new ValidationError(`Invalid protocol format: ${protocol}`);
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+
+    if (!this.handler.isValid(normalizedProtocol)) {
+      throw new ValidationError(
+        `Invalid protocol format: ${protocol}`,
+        ErrorCode.INVALID_PROTOCOL,
+      )
     }
 
-    // Get protocol info
-    const info = this.handler.parse(protocol);
-
-    // Validate using schema
-    this.validateSchema(info);
-  }
-
-  /**
-   * Validate protocol info against schema
-   */
-  private validateSchema(info: ProtocolInfo): void {
-    const schema = z.object({
-      name: z.string()
-        .min(1, 'Protocol name is required')
-        .max(20, 'Protocol name is too long')
-        .regex(/^[a-z][a-z0-9+.-]*$/, 'Invalid protocol name format'),
-      
-      secure: z.boolean(),
-      
-      defaultPort: z.number()
-        .int('Port must be an integer')
-        .min(1, 'Port must be positive')
-        .max(65535, 'Port must be less than 65536')
-        .optional(),
-      
-      allowedPorts: z.array(z.number()
-        .int('Port must be an integer')
-        .min(1, 'Port must be positive')
-        .max(65535, 'Port must be less than 65536'))
-        .optional()
-        .default([]),
-      
-      requiresHost: z.boolean(),
-      
-      supportsAuth: z.boolean(),
-      
-      category: z.enum(['web', 'mail', 'file', 'media', 'messaging', 'other'])
-    });
-
+    // Try to get protocol information
     try {
-      schema.parse(info);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const issues = error.issues.map(issue => issue.message).join(', ');
-        throw new ValidationError(`Protocol validation failed: ${issues}`);
+      this.handler.parse(normalizedProtocol)
+    }
+    catch (error) {
+      if (error instanceof ValidationError) {
+        throw error
       }
-      throw error;
+      throw new ValidationError(
+        `Failed to validate protocol: ${protocol}`,
+        ErrorCode.INVALID_PROTOCOL,
+      )
     }
   }
 
   /**
-   * Validate port number for protocol
+   * Checks if a protocol is a standard protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is standard
+   */
+  public isStandard(protocol: string): boolean {
+    return this.handler.isStandardProtocol(protocol)
+  }
+
+  /**
+   * Validates a port number for a specific protocol
+   * @param {string} protocol - The protocol to validate the port for
+   * @param {number} port - The port number to validate
+   * @throws {ValidationError} If the port is invalid for the protocol
    */
   public validatePort(protocol: string, port: number): void {
-    const info = this.handler.parse(protocol);
-
-    if (!port) {
-      throw new ValidationError('Port is required');
+    if (port === undefined || port === null) {
+      throw new ValidationError('Port is required', ErrorCode.INVALID_PORT)
     }
 
     if (!Number.isInteger(port)) {
-      throw new ValidationError('Port must be an integer');
+      throw new ValidationError(
+        'Port must be an integer',
+        ErrorCode.INVALID_PORT,
+      )
     }
 
     if (port < 1 || port > 65535) {
-      throw new ValidationError('Port must be between 1 and 65535');
+      throw new ValidationError(
+        'Port must be between 1 and 65535',
+        ErrorCode.INVALID_PORT,
+      )
     }
 
-    // Check against allowed ports if they are specified
-    const allowedPorts = info.allowedPorts || [];
-    if (allowedPorts.length > 0 && !allowedPorts.includes(port)) {
-      throw new ValidationError(
-        `Invalid port ${port} for protocol ${protocol}. ` +
-        `Allowed ports are: ${allowedPorts.join(', ')}`
-      );
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+
+    // Check if the port is allowed for this protocol
+    if (!ProtocolRegistry.isPortAllowed(normalizedProtocol, port)) {
+      const allowedPorts = this.handler.getAllowedPorts(normalizedProtocol)
+
+      if (allowedPorts.length > 0) {
+        throw new ValidationError(
+          `Invalid port ${port} for protocol ${protocol}. Allowed ports are: ${allowedPorts.join(', ')}`,
+          ErrorCode.INVALID_PORT,
+        )
+      }
     }
   }
 
   /**
-   * Check if protocol requires secure connection
+   * Checks if a protocol requires a secure connection
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol requires security
    */
   public requiresSecure(protocol: string): boolean {
-    const info = this.handler.parse(protocol);
-    return info.secure;
+    return this.handler.requiresSecureConnection(protocol)
   }
 
   /**
-   * Check if protocol supports authentication
+   * Checks if a protocol supports authentication
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol supports authentication
    */
   public supportsAuth(protocol: string): boolean {
-    const info = this.handler.parse(protocol);
-    return info.supportsAuth;
+    return this.handler.supportsAuth(protocol)
   }
 
   /**
-   * Check if protocol requires host
+   * Checks if a protocol requires a host
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol requires a host
    */
   public requiresHost(protocol: string): boolean {
-    const info = this.handler.parse(protocol);
-    return info.requiresHost;
+    return this.handler.requiresHost(protocol)
   }
 
   /**
-   * Get default port for protocol
+   * Gets the default port for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {number | undefined} The default port or undefined if none
    */
   public getDefaultPort(protocol: string): number | undefined {
-    const info = this.handler.parse(protocol);
-    return info.defaultPort;
+    return this.handler.getDefaultPort(protocol)
   }
 
   /**
-   * Get allowed ports for protocol
+   * Gets a list of allowed ports for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {number[]} Array of allowed port numbers
    */
   public getAllowedPorts(protocol: string): number[] {
-    const info = this.handler.parse(protocol);
-    return info.allowedPorts || [];
+    return this.handler.getAllowedPorts(protocol)
   }
 
   /**
-   * Get protocol category
+   * Gets the category of a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {string} The protocol category
    */
   public getCategory(protocol: string): string {
-    const info = this.handler.parse(protocol);
-    return info.category;
+    return this.handler.getCategory(protocol)
+  }
+
+  /**
+   * Checks if a protocol is secure
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is secure
+   */
+  public isSecure(protocol: string): boolean {
+    return this.handler.isSecure(protocol)
+  }
+
+  /**
+   * Gets a secure alternative for an insecure protocol
+   * @param {string} protocol - The protocol to find an alternative for
+   * @returns {string | undefined} The secure alternative or undefined if none
+   */
+  public getSecureAlternative(protocol: string): string | undefined {
+    return this.handler.getSecureAlternative(protocol)
+  }
+
+  /**
+   * Checks if a protocol has known security warnings
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol has security warnings
+   */
+  public hasSecurityWarnings(protocol: string): boolean {
+    const security = this.handler.getSecurity(protocol)
+    return security.warnings !== undefined && security.warnings.length > 0
+  }
+
+  /**
+   * Gets the list of security warnings for a protocol
+   * @param {string} protocol - The protocol to check
+   * @returns {string[]} Array of security warning messages
+   */
+  public getSecurityWarnings(protocol: string): string[] {
+    const security = this.handler.getSecurity(protocol)
+    return security.warnings || []
+  }
+
+  /**
+   * Validates a protocol for a specific usage scenario
+   * @param {string} protocol - The protocol to validate
+   * @param {"browsing" | "download" | "upload" | "streaming" | "messaging"} usage - The intended usage
+   * @throws {ValidationError} If the protocol doesn't support the usage
+   */
+  public validateForUsage(
+    protocol: string,
+    usage: 'browsing' | 'download' | 'upload' | 'streaming' | 'messaging',
+  ): void {
+    if (!this.handler.supportsUsage(protocol, usage)) {
+      throw new ValidationError(
+        `Protocol ${protocol} does not support ${usage}`,
+        ErrorCode.UNSUPPORTED_OPERATION,
+      )
+    }
+  }
+
+  /**
+   * Validates a protocol for secure usage
+   * @param {string} protocol - The protocol to validate
+   * @throws {ValidationError} If the protocol is not secure
+   */
+  public validateForSecureUsage(protocol: string): void {
+    if (!this.handler.isSecure(protocol)) {
+      const secureAlternative = this.handler.getSecureAlternative(protocol)
+
+      if (secureAlternative) {
+        throw new ValidationError(
+          `Protocol ${protocol} is not secure. Consider using ${secureAlternative} instead.`,
+          ErrorCode.UNSAFE_PROTOCOL,
+        )
+      }
+      else {
+        throw new ValidationError(
+          `Protocol ${protocol} is not secure.`,
+          ErrorCode.UNSAFE_PROTOCOL,
+        )
+      }
+    }
+  }
+
+  /**
+   * Checks if a protocol is potentially dangerous
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is considered dangerous
+   */
+  public isDangerous(protocol: string): boolean {
+    const dangerousProtocols = [
+      'javascript',
+      'data',
+      'vbscript',
+      'jscript',
+      'livescript',
+      'mocha',
+    ]
+
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+    return dangerousProtocols.includes(normalizedProtocol)
+  }
+
+  /**
+   * Checks if a protocol is deprecated
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol is deprecated
+   */
+  public isDeprecated(protocol: string): boolean {
+    const deprecatedProtocols = ['telnet', 'gopher', 'wais']
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+    return deprecatedProtocols.includes(normalizedProtocol)
+  }
+
+  /**
+   * Checks if a protocol requires TLS (Transport Layer Security)
+   * @param {string} protocol - The protocol to check
+   * @returns {boolean} True if the protocol requires TLS
+   */
+  public requiresTLS(protocol: string): boolean {
+    const tlsProtocols = [
+      'https',
+      'wss',
+      'ftps',
+      'smtps',
+      'imaps',
+      'pop3s',
+      'ldaps',
+    ]
+    const normalizedProtocol = ProtocolRegistry.normalizeProtocol(protocol)
+    return tlsProtocols.includes(normalizedProtocol)
   }
 }

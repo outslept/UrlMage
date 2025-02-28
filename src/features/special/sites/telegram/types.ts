@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const TelegramURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['channel', 'user', 'group', 'sticker', 'addstickers', 'share', 'proxy', 'joinchat']),
@@ -13,7 +13,7 @@ export const TelegramURLSchema = BaseSpecialURLSchema.extend({
   secret: z.string().optional(),
   setName: z.string().optional(),
   shareUrl: z.string().optional(),
-  shareText: z.string().optional()
-});
+  shareText: z.string().optional(),
+})
 
-export type TelegramURL = z.infer<typeof TelegramURLSchema>;
+export type TelegramURL = z.infer<typeof TelegramURLSchema>

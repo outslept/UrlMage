@@ -1,80 +1,149 @@
 /**
- * Base error codes for the URL manipulation library
+ * Error code enumeration for the URL manipulation library
+ * @enum {number}
  */
 export enum ErrorCode {
-  // Validation Errors (1000-1999)
-  VALIDATION_ERROR = 1000,
-  INVALID_URL = 1001,
-  INVALID_PROTOCOL = 1002,
-  INVALID_DOMAIN = 1003,
-  INVALID_PATH = 1004,
-  INVALID_QUERY = 1005,
-  INVALID_FRAGMENT = 1006,
-  INVALID_PORT = 1007,
-  INVALID_AUTH = 1008,
-  INVALID_IP = 1009,
-  INVALID_ENCODING = 1010,
-  INVALID_FORMAT = 1011,
-  INVALID_PARAMETER = 1012,
+  /**
+   * Base error code for invalid URL format
+   * @type {number}
+   */
+  INVALID_URL = 100,
 
-  // Security Errors (2000-2999)
-  SECURITY_ERROR = 2000,
-  BLOCKED_PROTOCOL = 2001,
-  BLOCKED_DOMAIN = 2002,
-  BLOCKED_IP = 2003,
-  INSECURE_PROTOCOL = 2004,
-  MALICIOUS_CONTENT = 2005,
-  UNSAFE_REDIRECT = 2006,
-  INVALID_CERTIFICATE = 2007,
-  SENSITIVE_DATA_LEAK = 2008,
+  /**
+   * Error when URL protocol is invalid
+   * @type {number}
+   */
+  INVALID_PROTOCOL = 101,
 
-  // Network Errors (3000-3999)
-  NETWORK_ERROR = 3000,
-  DNS_ERROR = 3001,
-  TIMEOUT_ERROR = 3002,
-  CONNECTION_ERROR = 3003,
-  SSL_ERROR = 3004,
-  PROXY_ERROR = 3005,
+  /**
+   * Error when hostname is malformed or invalid
+   * @type {number}
+   */
+  INVALID_HOSTNAME = 102,
 
-  // Resource Errors (4000-4999)
-  RESOURCE_ERROR = 4000,
-  NOT_FOUND = 4001,
-  ACCESS_DENIED = 4002,
-  RATE_LIMITED = 4003,
-  RESOURCE_EXHAUSTED = 4004,
+  /**
+   * Error when port number is out of range or invalid
+   * @type {number}
+   */
+  INVALID_PORT = 103,
 
-  // Internal Errors (5000-5999)
-  INTERNAL_ERROR = 5000,
-  PARSE_ERROR = 5001,
-  SERIALIZATION_ERROR = 5002,
-  CACHE_ERROR = 5003,
-  STATE_ERROR = 5004,
-  CONFIGURATION_ERROR = 5005,
+  /**
+   * Error when URL path contains invalid characters or format
+   * @type {number}
+   */
+  INVALID_PATH = 104,
 
-  // Feature-specific Errors (6000-6999)
-  FEATURE_ERROR = 6000,
-  UNSUPPORTED_FEATURE = 6001,
-  DISABLED_FEATURE = 6002,
-  INCOMPATIBLE_FEATURE = 6003,
+  /**
+   * Error when query string has invalid format
+   * @type {number}
+   */
+  INVALID_QUERY = 105,
 
-  // Third-party Integration Errors (7000-7999)
-  INTEGRATION_ERROR = 7000,
-  API_ERROR = 7001,
-  AUTHENTICATION_ERROR = 7002,
-  AUTHORIZATION_ERROR = 7003,
-  SERVICE_ERROR = 7004,
+  /**
+   * Error when URL fragment is invalid
+   * @type {number}
+   */
+  INVALID_FRAGMENT = 106,
 
-  // Data Errors (8000-8999)
-  DATA_ERROR = 8000,
-  INVALID_DATA = 8001,
-  CORRUPT_DATA = 8002,
-  INCOMPLETE_DATA = 8003,
-  INCONSISTENT_DATA = 8004,
+  /**
+   * Error when username or password in URL is invalid
+   * @type {number}
+   */
+  INVALID_CREDENTIALS = 107,
 
-  // Operation Errors (9000-9999)
-  OPERATION_ERROR = 9000,
-  INVALID_OPERATION = 9001,
-  UNSUPPORTED_OPERATION = 9002,
-  CONCURRENT_OPERATION = 9003,
-  ABORTED_OPERATION = 9004
+  /**
+   * Error when URL exceeds maximum allowed length
+   * @type {number}
+   */
+  URL_TOO_LONG = 108,
+
+  /**
+   * Error when IP address is invalid
+   * @type {number}
+   */
+  INVALID_IP = 109,
+
+  /**
+   * Error when an operation is not supported
+   * @type {number}
+   */
+  INVALID_OPERATION = 110,
+
+  /**
+   * Base error code for security-related issues
+   * @type {number}
+   */
+  SECURITY_RISK = 200,
+
+  /**
+   * Error when URL is identified as potentially malicious
+   * @type {number}
+   */
+  MALICIOUS_URL = 201,
+
+  /**
+   * Error when URL uses a protocol considered unsafe
+   * @type {number}
+   */
+  UNSAFE_PROTOCOL = 202,
+
+  /**
+   * Error when URL contains potential cross-site scripting vectors
+   * @type {number}
+   */
+  POTENTIAL_XSS = 203,
+
+  /**
+   * Error when URL represents a potential open redirect vulnerability
+   * @type {number}
+   */
+  OPEN_REDIRECT = 204,
+
+  /**
+   * Base error code for URL parsing failures
+   * @type {number}
+   */
+  PARSE_ERROR = 300,
+
+  /**
+   * Error when URL encoding fails
+   * @type {number}
+   */
+  ENCODING_ERROR = 301,
+
+  /**
+   * Error when URL decoding fails
+   * @type {number}
+   */
+  DECODING_ERROR = 302,
+
+  /**
+   * Base error code for general operation failures
+   * @type {number}
+   */
+  OPERATION_FAILED = 400,
+
+  /**
+   * Error when attempting an operation not supported by the library
+   * @type {number}
+   */
+  UNSUPPORTED_OPERATION = 401,
+
+  /**
+   * Error when requested feature is not yet implemented
+   * @type {number}
+   */
+  FEATURE_NOT_IMPLEMENTED = 402,
+
+  /**
+   * Base error code for special service-related errors
+   * @type {number}
+   */
+  SPECIAL_SERVICE_ERROR = 500,
+
+  /**
+   * Error when URL refers to a service not supported by the library
+   * @type {number}
+   */
+  UNSUPPORTED_SERVICE = 501,
 }

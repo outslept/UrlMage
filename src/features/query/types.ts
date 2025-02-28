@@ -1,19 +1,19 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * Query parameter value type
  */
-export type QueryValue = string | number | boolean | null | Array<string | number | boolean>;
+export type QueryValue = string | number | boolean | null | Array<string | number | boolean>
 
 /**
  * Query parameter information
  */
 export interface QueryParam {
-  key: string;
-  value: QueryValue;
-  isArray: boolean;
-  hasMultipleValues: boolean;
-  rawValue: string;
+  key: string
+  value: QueryValue
+  isArray: boolean
+  hasMultipleValues: boolean
+  rawValue: string
 }
 
 /**
@@ -21,17 +21,17 @@ export interface QueryParam {
  */
 export interface QueryInfo {
   /** Original query string */
-  original: string;
+  original: string
   /** Normalized query string */
-  normalized: string;
+  normalized: string
   /** Query parameters */
-  params: QueryParam[];
+  params: QueryParam[]
   /** Total number of parameters */
-  paramCount: number;
+  paramCount: number
   /** Whether query string is empty */
-  isEmpty: boolean;
+  isEmpty: boolean
   /** Total length of query string */
-  length: number;
+  length: number
 }
 
 /**
@@ -39,21 +39,21 @@ export interface QueryInfo {
  */
 export interface QueryOptions {
   /** Array format: bracket, index, comma, or none */
-  arrayFormat?: 'bracket' | 'index' | 'comma' | 'none';
+  arrayFormat?: 'bracket' | 'index' | 'comma' | 'none'
   /** Whether to encode values */
-  encode?: boolean;
+  encode?: boolean
   /** Whether to decode values */
-  decode?: boolean;
+  decode?: boolean
   /** Whether to sort parameters */
-  sort?: boolean;
+  sort?: boolean
   /** Whether to allow duplicates */
-  allowDuplicates?: boolean;
+  allowDuplicates?: boolean
   /** Whether to remove empty values */
-  removeEmpty?: boolean;
+  removeEmpty?: boolean
   /** Custom encoder function */
-  encoder?: (value: string) => string;
+  encoder?: (value: string) => string
   /** Custom decoder function */
-  decoder?: (value: string) => string;
+  decoder?: (value: string) => string
 }
 
 /**
@@ -61,23 +61,23 @@ export interface QueryOptions {
  */
 export interface QueryValidationOptions {
   /** Maximum total length */
-  maxLength?: number;
+  maxLength?: number
   /** Maximum number of parameters */
-  maxParams?: number;
+  maxParams?: number
   /** Maximum key length */
-  maxKeyLength?: number;
+  maxKeyLength?: number
   /** Maximum value length */
-  maxValueLength?: number;
+  maxValueLength?: number
   /** Allowed parameter names pattern */
-  allowedParams?: RegExp;
+  allowedParams?: RegExp
   /** Forbidden parameter names pattern */
-  forbiddenParams?: RegExp;
+  forbiddenParams?: RegExp
   /** Required parameters */
-  requiredParams?: string[];
+  requiredParams?: string[]
   /** Allowed value types */
-  allowedTypes?: ('string' | 'number' | 'boolean' | 'null' | 'array')[];
+  allowedTypes?: ('string' | 'number' | 'boolean' | 'null' | 'array')[]
   /** Custom validation function */
-  customValidator?: (param: QueryParam) => boolean;
+  customValidator?: (param: QueryParam) => boolean
 }
 
 // Zod schemas for validation
@@ -86,16 +86,16 @@ export const QueryValueSchema = z.union([
   z.number(),
   z.boolean(),
   z.null(),
-  z.array(z.union([z.string(), z.number(), z.boolean()]))
-]);
+  z.array(z.union([z.string(), z.number(), z.boolean()])),
+])
 
 export const QueryParamSchema = z.object({
   key: z.string(),
   value: QueryValueSchema,
   isArray: z.boolean(),
   hasMultipleValues: z.boolean(),
-  rawValue: z.string()
-});
+  rawValue: z.string(),
+})
 
 export const QueryInfoSchema = z.object({
   original: z.string(),
@@ -103,5 +103,5 @@ export const QueryInfoSchema = z.object({
   params: z.array(QueryParamSchema),
   paramCount: z.number(),
   isEmpty: z.boolean(),
-  length: z.number()
-});
+  length: z.number(),
+})

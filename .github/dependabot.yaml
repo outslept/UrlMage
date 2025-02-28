@@ -1,11 +1,11 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
+  - package-ecosystem: npm
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: weekly
     labels:
-      - 'dependencies'
+      - dependencies
     open-pull-requests-limit: 10
     versioning-strategy: increase
     ignore:
@@ -15,20 +15,20 @@ updates:
       dev-dependencies:
         patterns:
           - '*eslint*'
-          - 'prettier'
-          - 'typescript'
+          - prettier
+          - typescript
       build-tools:
         patterns:
           - '*eslint*'
-          - 'prettier'
-          - 'typescript'
+          - prettier
+          - typescript
     commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      prefix: chore
+      include: scope
 
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: 'weekly'
+      interval: weekly
     labels:
-      - 'github-actions'
+      - github-actions

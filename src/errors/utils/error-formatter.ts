@@ -1,11 +1,10 @@
-import { BaseError } from '../base-error';
+import type { BaseError } from '../base-error'
 
-/**
- * Format errors for output/logging
- */
 export class ErrorFormatter {
   /**
-   * Format error for output
+   * Formats a BaseError instance into a structured object for output
+   * @param {BaseError} error - The error to format
+   * @returns {Record<string, unknown>} A structured representation of the error
    */
   public format(error: BaseError): Record<string, unknown> {
     return {
@@ -13,85 +12,88 @@ export class ErrorFormatter {
       formatted: this.formatMessage(error),
       category: this.getCategory(error),
       severity: this.getSeverity(error),
-      metadata: this.getMetadata(error)
-    };
+      metadata: this.getMetadata(error),
+    }
   }
 
   /**
-   * Format error message with context
+   * Creates a human-readable error message with context
+   * @param {BaseError} error - The error to format
+   * @returns {string} A formatted error message string
+   * @protected
    */
   protected formatMessage(error: BaseError): string {
-    const parts: string[] = [error.message];
+    const parts: string[] = [error.message]
 
     // Add error code
-    parts.push(`[${error.code}]`);
+    parts.push(`[${error.code}]`)
 
     // Add error category
-    const category = this.getCategory(error);
+    const category = this.getCategory(error)
     if (category) {
-      parts.push(`(${category})`);
+      parts.push(`(${category})`)
     }
 
     // Add cause if present
     if (error.cause) {
-      parts.push(`Caused by: ${error.cause.message}`);
+      parts.push(`Caused by: ${error.cause.message}`)
     }
 
-    return parts.join(' ');
+    return parts.join(' ')
   }
 
   /**
-   * Get error category name
+   * Determines the category name based on the error code
+   * @param {BaseError} error - The error to categorize
+   * @returns {string} The category name
+   * @protected
    */
   protected getCategory(error: BaseError): string {
-    const category = Math.floor(error.code / 1000);
+    const category = Math.floor(error.code / 100)
     switch (category) {
       case 1:
-        return 'Validation';
+        return 'Validation'
       case 2:
-        return 'Security';
+        return 'Security'
       case 3:
-        return 'Network';
+        return 'Parsing'
       case 4:
-        return 'Resource';
+        return 'Operation'
       case 5:
-        return 'Internal';
-      case 6:
-        return 'Feature';
-      case 7:
-        return 'Integration';
-      case 8:
-        return 'Data';
-      case 9:
-        return 'Operation';
+        return 'Special Service'
       default:
-        return 'Unknown';
+        return 'Unknown'
     }
   }
 
   /**
-   * Get error severity level
+   * Determines the severity level based on the error code
+   * @param {BaseError} error - The error to evaluate
+   * @returns {string} The severity level (critical, error, warning, or info)
+   * @protected
    */
   protected getSeverity(error: BaseError): string {
-    const category = Math.floor(error.code / 1000);
+    const category = Math.floor(error.code / 100)
     switch (category) {
       case 1: // Validation
-      case 4: // Resource
-        return 'warning';
+        return 'warning'
       case 2: // Security
-        return 'critical';
-      case 3: // Network
-      case 7: // Integration
-        return 'error';
-      case 5: // Internal
-        return 'fatal';
+        return 'critical'
+      case 3: // Parsing
+      case 4: // Operation
+        return 'error'
+      case 5: // Special Service
+        return 'info'
       default:
-        return 'info';
+        return 'info'
     }
   }
 
   /**
-   * Get additional error metadata
+   * Extracts additional metadata from the error
+   * @param {BaseError} error - The error to extract metadata from
+   * @returns {Record<string, unknown>} A structured object containing error metadata
+   * @protected
    */
   protected getMetadata(error: BaseError): Record<string, unknown> {
     return {
@@ -99,21 +101,24 @@ export class ErrorFormatter {
       code: error.code,
       name: error.name,
       details: error.details || {},
-      stack: this.formatStack(error.stack)
-    };
+      stack: this.formatStack(error.stack),
+    }
   }
 
   /**
-   * Format error stack trace
+   * Formats the stack trace for better readability
+   * @param {string} [stack] - The raw stack trace
+   * @returns {string[] | undefined} An array of formatted stack lines or undefined if no stack
+   * @protected
    */
   protected formatStack(stack?: string): string[] | undefined {
     if (!stack) {
-      return undefined;
+      return undefined
     }
 
     return stack
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.startsWith('at '));
+      .filter(line => line.startsWith('at '))
   }
 }

@@ -1,4 +1,4 @@
-import { ValidationError } from '../errors';
+import { ValidationError } from '../errors'
 
 /**
  * URL validation utilities
@@ -9,13 +9,14 @@ export class ValidationUtils {
    */
   public static validateUrl(url: string): boolean {
     try {
-      new URL(url);
-      return true;
-    } catch (error) {
+      new URL(url)
+      return true
+    }
+    catch (error) {
       if (error instanceof Error) {
-        throw new ValidationError('Invalid URL', { cause: error });
+        throw new ValidationError('Invalid URL', { cause: error })
       }
-      throw error;
+      throw error
     }
   }
 
@@ -24,11 +25,11 @@ export class ValidationUtils {
    */
   public static validateHostname(hostname: string): boolean {
     // RFC 1123 hostname validation
-    const pattern = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const pattern = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i
     if (!pattern.test(hostname)) {
-      throw new ValidationError('Invalid hostname format');
+      throw new ValidationError('Invalid hostname format')
     }
-    return true;
+    return true
   }
 
   /**
@@ -37,9 +38,9 @@ export class ValidationUtils {
   public static validatePath(path: string): boolean {
     // Basic path validation
     if (!path.startsWith('/')) {
-      throw new ValidationError('Path must start with /');
+      throw new ValidationError('Path must start with /')
     }
-    return true;
+    return true
   }
 
   /**
@@ -47,13 +48,14 @@ export class ValidationUtils {
    */
   public static validateQueryString(query: string): boolean {
     try {
-      new URLSearchParams(query);
-      return true;
-    } catch (error) {
+      new URLSearchParams(query)
+      return true
+    }
+    catch (error) {
       if (error instanceof Error) {
-        throw new ValidationError('Invalid query string', { cause: error });
+        throw new ValidationError('Invalid query string', { cause: error })
       }
-      throw error;
+      throw error
     }
   }
 
@@ -61,10 +63,10 @@ export class ValidationUtils {
    * Validate port number
    */
   public static validatePort(port: string | number): boolean {
-    const portNum = typeof port === 'string' ? parseInt(port, 10) : port;
-    if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
-      throw new ValidationError('Invalid port number');
+    const portNum = typeof port === 'string' ? Number.parseInt(port, 10) : port
+    if (Number.isNaN(portNum) || portNum < 1 || portNum > 65535) {
+      throw new ValidationError('Invalid port number')
     }
-    return true;
+    return true
   }
 }

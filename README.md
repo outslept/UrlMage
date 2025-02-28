@@ -1,8 +1,8 @@
 <p align="center">
   <picture >
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg" width=50% height=50%>
-    <img alt="UrlMage" src="https://raw.githubusercontent.com/idkgene/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/outslept/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/outslept/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/black.svg" width=50% height=50%>
+    <img alt="UrlMage" src="https://raw.githubusercontent.com/outslept/static/7f89bf258f752513f75707ca59e51f036f750850/urlmage/grey.svg" width=50% height=50%>
   </picture>
 </p>
 

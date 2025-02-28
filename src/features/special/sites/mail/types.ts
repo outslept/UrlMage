@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseSpecialURLSchema } from '../../base/types';
+import { z } from 'zod'
+import { BaseSpecialURLSchema } from '../../base/types'
 
 export const MailURLSchema = BaseSpecialURLSchema.extend({
   type: z.enum(['mailto', 'webmail', 'settings', 'compose']),
@@ -12,7 +12,7 @@ export const MailURLSchema = BaseSpecialURLSchema.extend({
   folder: z.string().optional(),
   messageId: z.string().optional(),
   searchQuery: z.string().optional(),
-  attachments: z.array(z.string()).optional()
-});
+  attachments: z.array(z.string()).optional(),
+})
 
-export type MailURL = z.infer<typeof MailURLSchema>;
+export type MailURL = z.infer<typeof MailURLSchema>
