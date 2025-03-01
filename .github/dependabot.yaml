@@ -4,31 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    labels:
-      - dependencies
-    open-pull-requests-limit: 10
-    versioning-strategy: increase
-    ignore:
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
-    groups:
-      dev-dependencies:
-        patterns:
-          - '*eslint*'
-          - prettier
-          - typescript
-      build-tools:
-        patterns:
-          - '*eslint*'
-          - prettier
-          - typescript
-    commit-message:
-      prefix: chore
-      include: scope
+    open-pull-requests-limit: 0
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
-    labels:
-      - github-actions
+    open-pull-requests-limit: 0

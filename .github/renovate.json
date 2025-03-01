@@ -1,0 +1,51 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":dependencyDashboard"
+  ],
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@antfu/", "eslint", "typescript", "lint-staged", "simple-git-hooks", "commitlint"],
+      "groupName": "linting and code quality",
+      "labels": ["lint"]
+    },
+    {
+      "matchPackagePatterns": ["vitest", "coverage"],
+      "groupName": "testing packages",
+      "labels": ["test"]
+    },
+    {
+      "matchPackageNames": ["unbuild", "tsx", "taze", "concurrently", "pathe"],
+      "groupName": "build tools",
+      "labels": ["build"]
+    },
+    {
+      "matchPackageNames": ["pino", "pino-http"],
+      "groupName": "logging packages",
+      "labels": ["logging"]
+    },
+    {
+      "matchPackageNames": ["nanoid", "p-memoize", "p-queue", "parse-domain", "zod"],
+      "groupName": "core dependencies",
+      "labels": ["core"]
+    },
+    {
+      "matchPackageNames": ["@changesets/cli"],
+      "groupName": "release tools",
+      "labels": ["release"]
+    },
+    {
+      "matchPackagePatterns": ["*"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "commitMessagePrefix": "chore: ",
+  "commitMessageTopic": "{{depName}}",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  }
+}
