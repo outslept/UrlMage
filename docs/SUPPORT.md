@@ -13,7 +13,7 @@ Questions can go to [GitHub discussions][dicussion].
 
 Help us help you!
 
-Spend time framing questions and add links and resources.  
+Spend time framing questions and add links and resources.
 Spending the extra time up front can help save everyone time in the long run.
 
 > [!Tip]

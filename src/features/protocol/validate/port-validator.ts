@@ -39,7 +39,8 @@ export class PortValidator {
     try {
       const protocolInfo = ProtocolRegistry.getProtocol(protocol)
       return protocolInfo.allowedPorts || []
-    } catch (error) {
+    }
+    catch (error) {
       return []
     }
   }

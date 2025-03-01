@@ -32,10 +32,10 @@ export const DEFAULT_MAX_SEGMENT_LENGTH = 255
  * Pattern for validating safe filenames
  * Allows alphanumeric characters, underscores, hyphens, periods, spaces and parentheses
  */
-export const SAFE_FILENAME_PATTERN = /^[a-zA-Z0-9_\-. ()]+$/
+export const SAFE_FILENAME_PATTERN = /^[\w\-. ()]+$/
 
 /**
  * Pattern for detecting URL-encoded characters (e.g., %20 for space)
  * Used when processing paths that may contain encoded characters
  */
-export const URL_ENCODED_PATTERN = /%[0-9A-Fa-f]{2}/
+export const URL_ENCODED_PATTERN = /%[0-9A-F]{2}/i

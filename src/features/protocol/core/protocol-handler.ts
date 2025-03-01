@@ -1,9 +1,10 @@
-import { ErrorCode, ValidationError } from "../../../errors"
-import { ProtocolCapabilities } from "../types/capabilities"
-import { ProtocolCategory, ProtocolFullInfo } from "../types/protocol"
-import { ProtocolSecurity } from "../types/security"
-import { ProtocolParser } from "./protocol-parser"
-import { ProtocolRegistry } from "./protocol-registry"
+import type { ProtocolCapabilities } from '../types/capabilities'
+import type { ProtocolFullInfo } from '../types/protocol'
+import type { ProtocolSecurity } from '../types/security'
+import { ErrorCode, ValidationError } from '../../../errors'
+import { ProtocolCategory } from '../types/protocol'
+import { ProtocolParser } from './protocol-parser'
+import { ProtocolRegistry } from './protocol-registry'
 
 export class ProtocolHandler {
   private readonly parser: ProtocolParser

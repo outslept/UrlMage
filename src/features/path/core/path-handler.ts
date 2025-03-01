@@ -1,7 +1,7 @@
-import { ErrorCode, ValidationError } from "../../../errors";
-import { PathInfo, PathOptions } from "../types/path"
-import { PathParser } from "./path-parser"
-import * as pathe from 'pathe';
+import type { PathInfo, PathOptions } from '../types/path'
+import * as pathe from 'pathe'
+import { ErrorCode, ValidationError } from '../../../errors'
+import { PathParser } from './path-parser'
 
 export class PathHandler {
   private readonly parser: PathParser
@@ -289,7 +289,7 @@ export class PathHandler {
       results.push(current)
     }
 
-    return results.slice(0, -1) 
+    return results.slice(0, -1)
   }
 
   /**

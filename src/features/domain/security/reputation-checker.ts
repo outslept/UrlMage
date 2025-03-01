@@ -1,7 +1,7 @@
+import type { DomainHandler } from '../core/domain-handler'
 import { isIP } from 'node:net'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { DomainHandler } from '../core/domain-handler'
 
 export class ReputationChecker {
   private readonly domainHandler: DomainHandler

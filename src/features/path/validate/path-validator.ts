@@ -1,6 +1,6 @@
 import type { PathValidationOptions } from '../types/path'
-import { PathHandler } from '../core/path-handler'
 import { ErrorCode, ValidationError } from '../../../errors'
+import { PathHandler } from '../core/path-handler'
 
 export class PathValidator {
   private readonly handler: PathHandler

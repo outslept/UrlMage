@@ -1,16 +1,16 @@
 import { isIP } from 'node:net'
+import punycode from 'node:punycode'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { DomainHandler } from '../core/domain-handler'
 import { DOMAIN_CONSTANTS } from '../constants'
+import { DomainHandler } from '../core/domain-handler'
 import { PunycodeValidator } from './punycode'
-import punycode from 'punycode';
 
 export class DomainValidator {
   private readonly domainHandler: DomainHandler
   private readonly punycodeValidator: PunycodeValidator
-  private readonly maxLength = DOMAIN_CONSTANTS.MAX_DOMAIN_LENGTH       // Maximum length for entire domain
-  private readonly maxLabelLength = DOMAIN_CONSTANTS.MAX_LABEL_LENGTH   // Maximum length for each domain label
+  private readonly maxLength = DOMAIN_CONSTANTS.MAX_DOMAIN_LENGTH // Maximum length for entire domain
+  private readonly maxLabelLength = DOMAIN_CONSTANTS.MAX_LABEL_LENGTH // Maximum length for each domain label
 
   constructor() {
     this.domainHandler = new DomainHandler()

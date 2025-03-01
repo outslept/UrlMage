@@ -9,43 +9,48 @@ export class ProtocolOperations {
   }
 
   public convertToSecureUrl(url: string): string {
-    if (!url) return url
-    
+    if (!url)
+      return url
+
     try {
       const urlObj = new URL(url)
       const protocol = this.parser.extractFromUrl(url)
-      
-      if (!protocol) return url
-      
+
+      if (!protocol)
+        return url
+
       const secureProtocol = this.parser.toSecureProtocol(protocol)
-      
+
       if (secureProtocol !== protocol) {
         urlObj.protocol = `${secureProtocol}:`
         return urlObj.toString()
       }
-      
+
       return url
-    } catch (error) {
+    }
+    catch (error) {
       // Invalid URL, return original
       return url
     }
   }
 
   public normalizeUrl(url: string): string {
-    if (!url) return url
-    
+    if (!url)
+      return url
+
     try {
       const urlObj = new URL(url)
       return urlObj.toString()
-    } catch (error) {
+    }
+    catch (error) {
       // If it's not a valid URL, try to fix common issues
-      
+
       // Check if missing protocol
       if (!url.includes('://')) {
         // Assume http by default
         return this.normalizeUrl(`http://${url}`)
       }
-      
+
       // If still invalid, return original
       return url
     }
@@ -53,8 +58,9 @@ export class ProtocolOperations {
 
   public getDefaultPortForUrl(url: string): number | undefined {
     const protocol = this.parser.extractFromUrl(url)
-    if (!protocol) return undefined
-    
+    if (!protocol)
+      return undefined
+
     return ProtocolRegistry.getDefaultPort(protocol)
   }
 
@@ -64,41 +70,46 @@ export class ProtocolOperations {
       if (!urlObj.port) {
         return true
       }
-      
+
       const defaultPort = this.getDefaultPortForUrl(url)
-      if (!defaultPort) return false
-      
-      return parseInt(urlObj.port, 10) === defaultPort
-    } catch (error) {
+      if (!defaultPort)
+        return false
+
+      return Number.parseInt(urlObj.port, 10) === defaultPort
+    }
+    catch (error) {
       return false
     }
   }
 
   public removeDefaultPort(url: string): string {
-    if (!url) return url
-    
+    if (!url)
+      return url
+
     try {
       const urlObj = new URL(url)
       const defaultPort = this.getDefaultPortForUrl(url)
-      
-      if (defaultPort && urlObj.port && parseInt(urlObj.port, 10) === defaultPort) {
+
+      if (defaultPort && urlObj.port && Number.parseInt(urlObj.port, 10) === defaultPort) {
         urlObj.port = ''
         return urlObj.toString()
       }
-      
+
       return url
-    } catch (error) {
+    }
+    catch (error) {
       return url
     }
   }
 
   public isUrlSuitableFor(
-    url: string, 
-    usage: 'browsing' | 'download' | 'upload' | 'streaming' | 'messaging'
+    url: string,
+    usage: 'browsing' | 'download' | 'upload' | 'streaming' | 'messaging',
   ): boolean {
     const protocol = this.parser.extractFromUrl(url)
-    if (!protocol) return false
-    
+    if (!protocol)
+      return false
+
     const usageMap: Record<string, string[]> = {
       browsing: ['http', 'https', 'file'],
       download: ['http', 'https', 'ftp', 'sftp', 'file'],
@@ -106,7 +117,7 @@ export class ProtocolOperations {
       streaming: ['http', 'https', 'ws', 'wss', 'rtmp', 'rtsp'],
       messaging: ['ws', 'wss', 'mqtt', 'amqp'],
     }
-    
+
     return usageMap[usage]?.includes(protocol) || false
   }
 }

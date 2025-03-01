@@ -4,7 +4,6 @@ import { ErrorCode } from '../../errors/types'
 import { ProtocolCategory } from '../types/protocol'
 
 export class ProtocolRegistry {
-
   private static readonly protocols: Record<string, ProtocolFullInfo> = {
 
     http: {
@@ -27,8 +26,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 2 * 1024 * 1024, 
-        timeout: 30000, 
+        maxRequestSize: 2 * 1024 * 1024,
+        timeout: 30000,
       },
     },
     https: {
@@ -50,8 +49,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 2 * 1024 * 1024, 
-        timeout: 30000, 
+        maxRequestSize: 2 * 1024 * 1024,
+        timeout: 30000,
       },
     },
     ws: {
@@ -74,7 +73,7 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        timeout: 30000, 
+        timeout: 30000,
       },
     },
     wss: {
@@ -96,7 +95,7 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        timeout: 30000, 
+        timeout: 30000,
       },
     },
 
@@ -120,8 +119,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 10 * 1024 * 1024 * 1024, 
-        timeout: 120000, 
+        maxRequestSize: 10 * 1024 * 1024 * 1024,
+        timeout: 120000,
       },
     },
     sftp: {
@@ -141,8 +140,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 10 * 1024 * 1024 * 1024, 
-        timeout: 120000, 
+        maxRequestSize: 10 * 1024 * 1024 * 1024,
+        timeout: 120000,
       },
     },
     file: {
@@ -154,7 +153,7 @@ export class ProtocolRegistry {
       supportsAuth: false,
       category: ProtocolCategory.FILE,
       security: {
-        encrypted: true, 
+        encrypted: true,
         warnings: [],
       },
       capabilities: {
@@ -201,8 +200,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 25 * 1024 * 1024, 
-        timeout: 300000, 
+        maxRequestSize: 25 * 1024 * 1024,
+        timeout: 300000,
       },
     },
     smtps: {
@@ -222,8 +221,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 25 * 1024 * 1024, 
-        timeout: 300000, 
+        maxRequestSize: 25 * 1024 * 1024,
+        timeout: 300000,
       },
     },
     imap: {
@@ -243,7 +242,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 180000, 
+        timeout: 180000,
       },
     },
     imaps: {
@@ -263,7 +262,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 180000, 
+        timeout: 180000,
       },
     },
 
@@ -284,7 +283,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 60000, 
+        timeout: 60000,
       },
     },
     rtsp: {
@@ -304,7 +303,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 60000, 
+        timeout: 60000,
       },
     },
 
@@ -325,7 +324,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 30000, 
+        timeout: 30000,
       },
     },
     amqp: {
@@ -345,7 +344,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 30000, 
+        timeout: 30000,
       },
     },
   }

@@ -21,23 +21,25 @@ export class EncryptionChecker {
     }
 
     const security = this.securityChecker.getSecurityInfo(protocol)
-    
+
     // Check TLS version for strength determination
     if (security.tlsVersion) {
       if (security.tlsVersion.includes('1.3')) {
         return 'high'
-      } else if (security.tlsVersion.includes('1.2')) {
+      }
+      else if (security.tlsVersion.includes('1.2')) {
         return 'medium'
-      } else {
+      }
+      else {
         return 'low'
       }
     }
-    
+
     // If no specific TLS version but protocol is encrypted
     if (this.securityChecker.isSecure(protocol)) {
       return 'medium'
     }
-    
+
     return 'low'
   }
 
@@ -59,7 +61,7 @@ export class EncryptionChecker {
     if (this.isEncryptionSecure(protocol)) {
       return undefined // Already secure
     }
-    
+
     return this.securityChecker.getSecureAlternative(protocol)
   }
 }

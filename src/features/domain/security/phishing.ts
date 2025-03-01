@@ -1,4 +1,4 @@
-import { DomainHandler } from '../core/domain-handler'
+import type { DomainHandler } from '../core/domain-handler'
 import { isIP } from 'node:net'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
@@ -86,8 +86,8 @@ export class PhishingDetector {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1, // substitution
             Math.min(
-              matrix[i][j - 1] + 1,   // insertion
-              matrix[i - 1][j] + 1,   // deletion
+              matrix[i][j - 1] + 1, // insertion
+              matrix[i - 1][j] + 1, // deletion
             ),
           )
         }

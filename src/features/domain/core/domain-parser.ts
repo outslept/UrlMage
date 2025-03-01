@@ -1,8 +1,8 @@
+import type { DomainInfo, DomainPart } from '../types/domain'
 import { isIP } from 'node:net'
 import { parseDomain, ParseResultType } from 'parse-domain'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { DomainInfo, DomainPart } from '../types/domain'
 import { IpHandler } from './ip-handler'
 
 export class DomainParser {
@@ -16,7 +16,7 @@ export class DomainParser {
   public parse(domain: string): DomainInfo {
     // Clean up the domain by removing protocol prefixes
     domain = domain.replace(/^[a-z]+:\/\//, '')
-    
+
     // Remove path, query parameters and fragment
     domain = domain.split(/[/?#]/)[0]
 
@@ -24,8 +24,8 @@ export class DomainParser {
     if (isIP(domain)) {
       return {
         fullDomain: domain,
-        parts: [],                // IP addresses don't have domain parts
-        tld: '',                  // IP addresses don't have TLDs
+        parts: [], // IP addresses don't have domain parts
+        tld: '', // IP addresses don't have TLDs
         isIp: true,
         isLocal: this.ipHandler.isPrivateIP(domain) || this.ipHandler.isLoopbackIP(domain),
         isValid: true,
@@ -57,7 +57,7 @@ export class DomainParser {
         ],
         tld: '',
         isIp: false,
-        isLocal: true,           // Consider unlisted domains as local
+        isLocal: true, // Consider unlisted domains as local
         isValid: true,
       }
     }
@@ -103,7 +103,7 @@ export class DomainParser {
       name: sld,
       level: level++,
       isPublicSuffix: false,
-      isRegistrable: true,      // The SLD is the registrable part
+      isRegistrable: true, // The SLD is the registrable part
     })
 
     // Add the TLD if present
@@ -111,7 +111,7 @@ export class DomainParser {
       parts.push({
         name: tld,
         level,
-        isPublicSuffix: true,   // The TLD is a public suffix
+        isPublicSuffix: true, // The TLD is a public suffix
         isRegistrable: false,
       })
     }
@@ -134,7 +134,7 @@ export class DomainParser {
   public normalize(domain: string): string {
     // Remove protocol if present
     domain = domain.replace(/^[a-z]+:\/\//, '')
-    
+
     // Remove path, query parameters and fragment
     domain = domain.split(/[/?#]/)[0]
 

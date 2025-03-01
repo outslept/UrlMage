@@ -1,5 +1,5 @@
-import { PathHandler } from '../core/path-handler'
 import { UNSAFE_PATH_CHARS_PATTERN } from '../constants'
+import { PathHandler } from '../core/path-handler'
 
 export class PathOperations {
   private readonly handler: PathHandler
@@ -50,7 +50,7 @@ export class PathOperations {
       .normalizePath(path)
       .replace(/^\/+|\/+$/g, '')
       .replace(/\//g, '-')
-      .replace(/[^a-zA-Z0-9-_.]/g, '-')
+      .replace(/[^\w-.]/g, '-')
       .replace(/-+/g, '-')
       .toLowerCase()
   }

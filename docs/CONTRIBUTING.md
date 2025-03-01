@@ -8,8 +8,8 @@ Write something nice and instructive as an intro. Talk about what kind of contri
 
 ## Summary
 
-> [!Note]  
-> Before participating in our community, please read our [Code Of Conduct][coc].  
+> [!Note]
+> Before participating in our community, please read our [Code Of Conduct][coc].
 > By interacting with this repository, organization, or community you agree to abide by its terms.
 
 This document describes our development process. Following these guidelines shows that you respect the time and effort of the developers managing this project. In return, you will be shown respect in addressing your issue, reviewing your changes, and incorporating your contributions.
@@ -32,7 +32,7 @@ Some issues lack information, aren’t reproducible, or are just incorrect. You 
 
 ### Write code
 
-Code contributions are very welcome.  
+Code contributions are very welcome.
 It’s probably a good idea to first post a question or open an issue to report a bug or suggest a new feature before creating a pull request.
 
 ## Submitting an issue
@@ -49,7 +49,7 @@ It’s probably a good idea to first post a question or open an issue to report 
 
 What is your development process?
 
-> [!Tip]  
+> [!Tip]
 > This project follows the basic git flow.
 
 Check and follow the [README][readme] file and run the project on your local environment.
@@ -105,7 +105,7 @@ git push origin feature/branch-name
 
 ### Submitting the PR
 
-Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.  
+Once you've committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.
 If you need to make any adjustments to your pull request, just push the updates to your branch. Your pull request will automatically track the changes on your development branch and update.
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a build.
@@ -115,10 +115,10 @@ If you need to make any adjustments to your pull request, just push the updates 
 
 ### Review Process
 
-The core team reviews Pull Requests regularly in a weekly triage meeting held in a public domain. The schedule is announced in weekly status updates.  
+The core team reviews Pull Requests regularly in a weekly triage meeting held in a public domain. The schedule is announced in weekly status updates.
 Our Reviewer will provide constructive feedback by writing Review Comments (RC). The Pull Requester must address all RC in time.
 
-After feedback has been given, we expect responses within two weeks. If no activity is shown within this time, we may close the pull request.  
+After feedback has been given, we expect responses within two weeks. If no activity is shown within this time, we may close the pull request.
 For larger commits, we prefer a +1 from someone on the core team or another contributor. Please note if you reviewed the code or tested locally.
 
 ### Addressing Feedback

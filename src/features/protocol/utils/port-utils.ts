@@ -1,5 +1,5 @@
-import { ProtocolRegistry } from '../core/protocol-registry'
 import { ProtocolParser } from '../core/protocol-parser'
+import { ProtocolRegistry } from '../core/protocol-registry'
 
 export class PortUtils {
   private readonly parser: ProtocolParser
@@ -14,13 +14,14 @@ export class PortUtils {
       if (protocolInfo.allowedPorts && protocolInfo.allowedPorts.length > 0) {
         return protocolInfo.allowedPorts
       }
-      
+
       if (protocolInfo.defaultPort) {
         return [protocolInfo.defaultPort]
       }
-      
+
       return []
-    } catch (error) {
+    }
+    catch (error) {
       // Protocol not found in registry
       return []
     }
@@ -33,16 +34,17 @@ export class PortUtils {
 
   public getProtocolsForPort(port: number): string[] {
     const protocols: string[] = []
-    
+
     const allProtocols = ProtocolRegistry.getAllProtocols()
     for (const protocol of allProtocols) {
       if (protocol.defaultPort === port) {
         protocols.push(protocol.name)
-      } else if (protocol.allowedPorts && protocol.allowedPorts.includes(port)) {
+      }
+      else if (protocol.allowedPorts && protocol.allowedPorts.includes(port)) {
         protocols.push(protocol.name)
       }
     }
-    
+
     return protocols
   }
 
@@ -65,11 +67,14 @@ export class PortUtils {
   public getPortCategoryDescription(port: number): string {
     if (this.isWellKnownPort(port)) {
       return 'Well-known port (0-1023)'
-    } else if (this.isRegisteredPort(port)) {
+    }
+    else if (this.isRegisteredPort(port)) {
       return 'Registered port (1024-49151)'
-    } else if (this.isDynamicPort(port)) {
+    }
+    else if (this.isDynamicPort(port)) {
       return 'Dynamic/private port (49152-65535)'
-    } else {
+    }
+    else {
       return 'Invalid port'
     }
   }

@@ -1,7 +1,7 @@
+import type { IpAddress } from '../types/domain'
 import { isIP } from 'node:net'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { IpAddress } from '../types/domain'
 
 export class IpHandler {
   // Parse an IP address string into structured information
@@ -18,10 +18,10 @@ export class IpHandler {
     // Return structured information about the IP address
     return {
       address: ip,
-      version: version === 4 ? 'v4' : 'v6',  // Convert numeric version to string format
-      isPrivate: this.isPrivateIP(ip),        // Check if IP is in private address ranges
-      isLoopback: this.isLoopbackIP(ip),      // Check if IP is a loopback address
-      isMulticast: this.isMulticastIP(ip),    // Check if IP is a multicast address
+      version: version === 4 ? 'v4' : 'v6', // Convert numeric version to string format
+      isPrivate: this.isPrivateIP(ip), // Check if IP is in private address ranges
+      isLoopback: this.isLoopbackIP(ip), // Check if IP is a loopback address
+      isMulticast: this.isMulticastIP(ip), // Check if IP is a multicast address
     }
   }
 
@@ -40,10 +40,10 @@ export class IpHandler {
       // Check against known private IPv4 address ranges:
       // 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (link-local)
       return (
-        addr[0] === 10 
-        || (addr[0] === 172 && addr[1] >= 16 && addr[1] <= 31) 
-        || (addr[0] === 192 && addr[1] === 168) 
-        || (addr[0] === 169 && addr[1] === 254) 
+        addr[0] === 10
+        || (addr[0] === 172 && addr[1] >= 16 && addr[1] <= 31)
+        || (addr[0] === 192 && addr[1] === 168)
+        || (addr[0] === 169 && addr[1] === 254)
       )
     }
 
@@ -51,9 +51,9 @@ export class IpHandler {
       // Check against known private IPv6 address ranges:
       // fe80::/10 (link-local), fc00::/7 (unique local addresses)
       return (
-        ip.toLowerCase().startsWith('fe80:')  // Link-local
-        || ip.toLowerCase().startsWith('fc00:')  // Unique local
-        || ip.toLowerCase().startsWith('fd00:')  // Unique local
+        ip.toLowerCase().startsWith('fe80:') // Link-local
+        || ip.toLowerCase().startsWith('fc00:') // Unique local
+        || ip.toLowerCase().startsWith('fd00:') // Unique local
       )
     }
 

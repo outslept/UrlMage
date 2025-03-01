@@ -3,8 +3,8 @@ import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
 
 export class PunycodeUtils {
-   // Converts a Unicode domain to its Punycode representation (for DNS compatibility)
-   public toPunycode(domain: string): string {
+  // Converts a Unicode domain to its Punycode representation (for DNS compatibility)
+  public toPunycode(domain: string): string {
     try {
       // Split the domain into its component parts (by dots)
       const parts = domain.split('.')

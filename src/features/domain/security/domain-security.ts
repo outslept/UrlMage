@@ -1,8 +1,8 @@
 import { isIP } from 'node:net'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { DomainHandler } from '../core/domain-handler'
 import { SUSPICIOUS_TLDS } from '../constants'
+import { DomainHandler } from '../core/domain-handler'
 import { PhishingDetector } from './phishing'
 import { ReputationChecker } from './reputation-checker'
 
@@ -10,7 +10,7 @@ export class DomainSecurity {
   private readonly domainHandler: DomainHandler
   private readonly phishingDetector: PhishingDetector
   private readonly reputationChecker: ReputationChecker
-  private readonly suspiciousTLDs = SUSPICIOUS_TLDS  // List of TLDs known for abuse
+  private readonly suspiciousTLDs = SUSPICIOUS_TLDS // List of TLDs known for abuse
 
   constructor() {
     this.domainHandler = new DomainHandler()
@@ -84,7 +84,7 @@ export class DomainSecurity {
 
     // Parse the IP to get detailed information
     const ipInfo = this.domainHandler.parseIP(ip)
-    
+
     // IPs in private networks, loopback addresses, and multicast addresses
     // are considered unsafe for general internet usage
     return ipInfo.isPrivate || ipInfo.isLoopback || ipInfo.isMulticast

@@ -1,14 +1,15 @@
-import { DomainInfo, IpAddress } from '../types/domain'
+import type { DomainInfo, IpAddress } from '../types/domain'
+import type { IDomainHandler } from '../utils/domain-operations'
+import { DomainOperations } from '../utils/domain-operations'
+import { PunycodeUtils } from '../utils/punycode'
 import { DomainParser } from './domain-parser'
 import { IpHandler } from './ip-handler'
-import { PunycodeUtils } from '../utils/punycode'
-import { DomainOperations, IDomainHandler } from '../utils/domain-operations'
 
 // Acts as a facade for various domain-related operations
 export class DomainHandler implements IDomainHandler {
-  private readonly domainParser: DomainParser       // For parsing domain structures
-  private readonly ipHandler: IpHandler             // For handling IP addresses
-  private readonly punycodeUtils: PunycodeUtils     // For Punycode conversions
+  private readonly domainParser: DomainParser // For parsing domain structures
+  private readonly ipHandler: IpHandler // For handling IP addresses
+  private readonly punycodeUtils: PunycodeUtils // For Punycode conversions
   private readonly domainOperations: DomainOperations // For domain manipulation operations
 
   constructor() {
@@ -17,7 +18,7 @@ export class DomainHandler implements IDomainHandler {
     this.ipHandler = new IpHandler()
     this.punycodeUtils = new PunycodeUtils()
     // Note: DomainOperations requires this DomainHandler instance
-    this.domainOperations = new DomainOperations(this);
+    this.domainOperations = new DomainOperations(this)
   }
 
   // Parse a domain string into structured information

@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { ProtocolSecuritySchema } from './security'
 import { ProtocolCapabilitiesSchema } from './capabilities'
+import { ProtocolSecuritySchema } from './security'
 
 export enum ProtocolCategory {
   WEB = 'web',

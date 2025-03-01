@@ -1,7 +1,7 @@
+import type { DomainHandler } from '../core/domain-handler'
 import punycode from 'node:punycode'
 import { ValidationError } from '../../../errors'
 import { ErrorCode } from '../../../errors/types'
-import { DomainHandler } from '../core/domain-handler'
 import { DomainValidator } from './domain-validator'
 
 export class PunycodeValidator {
@@ -32,8 +32,8 @@ export class PunycodeValidator {
 
       // Validate both the Unicode form and the Punycode format itself
       return (
-        this.domainValidator.validate(normalizedDomain) && 
-        this.validatePunycodeFormat(domain)
+        this.domainValidator.validate(normalizedDomain)
+        && this.validatePunycodeFormat(domain)
       )
     }
     catch (error) {
