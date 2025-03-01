@@ -1,21 +1,12 @@
-import type { ProtocolFullInfo } from './types'
+import type { ProtocolFullInfo } from '../types/protocol'
 import { ValidationError } from '../../errors'
 import { ErrorCode } from '../../errors/types'
-import { ProtocolCategory } from './types'
+import { ProtocolCategory } from '../types/protocol'
 
-/**
- * Central registry for protocol information
- * @class ProtocolRegistry
- */
 export class ProtocolRegistry {
-  /**
-   * Registry of protocol definitions
-   * @private
-   * @static
-   * @readonly
-   */
+
   private static readonly protocols: Record<string, ProtocolFullInfo> = {
-    // Web protocols
+
     http: {
       name: 'http',
       secure: false,
@@ -36,8 +27,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 2 * 1024 * 1024, // 2MB
-        timeout: 30000, // 30 seconds
+        maxRequestSize: 2 * 1024 * 1024, 
+        timeout: 30000, 
       },
     },
     https: {
@@ -59,8 +50,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 2 * 1024 * 1024, // 2MB
-        timeout: 30000, // 30 seconds
+        maxRequestSize: 2 * 1024 * 1024, 
+        timeout: 30000, 
       },
     },
     ws: {
@@ -83,7 +74,7 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        timeout: 30000, // 30 seconds
+        timeout: 30000, 
       },
     },
     wss: {
@@ -105,11 +96,10 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: true,
         requiresAuthentication: false,
-        timeout: 30000, // 30 seconds
+        timeout: 30000, 
       },
     },
 
-    // File protocols
     ftp: {
       name: 'ftp',
       secure: false,
@@ -130,8 +120,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: true,
         requiresAuthentication: false,
-        maxRequestSize: 10 * 1024 * 1024 * 1024, // 10GB
-        timeout: 120000, // 2 minutes
+        maxRequestSize: 10 * 1024 * 1024 * 1024, 
+        timeout: 120000, 
       },
     },
     sftp: {
@@ -151,8 +141,8 @@ export class ProtocolRegistry {
         supportsCompression: true,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 10 * 1024 * 1024 * 1024, // 10GB
-        timeout: 120000, // 2 minutes
+        maxRequestSize: 10 * 1024 * 1024 * 1024, 
+        timeout: 120000, 
       },
     },
     file: {
@@ -164,7 +154,7 @@ export class ProtocolRegistry {
       supportsAuth: false,
       category: ProtocolCategory.FILE,
       security: {
-        encrypted: true, // local files are considered secure
+        encrypted: true, 
         warnings: [],
       },
       capabilities: {
@@ -175,7 +165,6 @@ export class ProtocolRegistry {
       },
     },
 
-    // Mail protocols
     mailto: {
       name: 'mailto',
       secure: false,
@@ -212,8 +201,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 25 * 1024 * 1024, // 25MB
-        timeout: 300000, // 5 minutes
+        maxRequestSize: 25 * 1024 * 1024, 
+        timeout: 300000, 
       },
     },
     smtps: {
@@ -233,8 +222,8 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        maxRequestSize: 25 * 1024 * 1024, // 25MB
-        timeout: 300000, // 5 minutes
+        maxRequestSize: 25 * 1024 * 1024, 
+        timeout: 300000, 
       },
     },
     imap: {
@@ -254,7 +243,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 180000, // 3 minutes
+        timeout: 180000, 
       },
     },
     imaps: {
@@ -274,11 +263,10 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 180000, // 3 minutes
+        timeout: 180000, 
       },
     },
 
-    // Media protocols
     rtmp: {
       name: 'rtmp',
       secure: false,
@@ -296,7 +284,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 60000, // 1 minute
+        timeout: 60000, 
       },
     },
     rtsp: {
@@ -316,11 +304,10 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 60000, // 1 minute
+        timeout: 60000, 
       },
     },
 
-    // Messaging protocols
     mqtt: {
       name: 'mqtt',
       secure: false,
@@ -338,7 +325,7 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: false,
-        timeout: 30000, // 30 seconds
+        timeout: 30000, 
       },
     },
     amqp: {
@@ -358,27 +345,16 @@ export class ProtocolRegistry {
         supportsCompression: false,
         supportsProxy: false,
         requiresAuthentication: true,
-        timeout: 30000, // 30 seconds
+        timeout: 30000, 
       },
     },
   }
 
-  /**
-   * Checks if a protocol exists in the registry
-   * @param {string} protocol - The protocol to check
-   * @returns {boolean} True if the protocol is registered
-   */
   public static hasProtocol(protocol: string): boolean {
     const normalizedProtocol = this.normalizeProtocol(protocol)
     return normalizedProtocol in this.protocols
   }
 
-  /**
-   * Gets information about a protocol
-   * @param {string} protocol - The protocol to get information for
-   * @returns {ProtocolFullInfo} Detailed protocol information
-   * @throws {ValidationError} If the protocol is unknown
-   */
   public static getProtocol(protocol: string): ProtocolFullInfo {
     const normalizedProtocol = this.normalizeProtocol(protocol)
 
@@ -392,19 +368,10 @@ export class ProtocolRegistry {
     return this.protocols[normalizedProtocol]
   }
 
-  /**
-   * Gets a list of all registered protocols
-   * @returns {ProtocolFullInfo[]} Array of all protocol definitions
-   */
   public static getAllProtocols(): ProtocolFullInfo[] {
     return Object.values(this.protocols)
   }
 
-  /**
-   * Gets a list of protocols in a specific category
-   * @param {ProtocolCategory} category - The category to filter by
-   * @returns {ProtocolFullInfo[]} Array of protocols in the category
-   */
   public static getProtocolsByCategory(
     category: ProtocolCategory,
   ): ProtocolFullInfo[] {
@@ -413,44 +380,24 @@ export class ProtocolRegistry {
     )
   }
 
-  /**
-   * Gets a list of secure protocols
-   * @returns {ProtocolFullInfo[]} Array of secure protocols
-   */
   public static getSecureProtocols(): ProtocolFullInfo[] {
     return Object.values(this.protocols).filter(protocol => protocol.secure)
   }
 
-  /**
-   * Normalizes a protocol name (removes colons and slashes, converts to lowercase)
-   * @param {string} protocol - The protocol to normalize
-   * @returns {string} The normalized protocol name
-   */
   public static normalizeProtocol(protocol: string): string {
     return protocol.toLowerCase().replace(/[:/]+$/, '')
   }
 
-  /**
-   * Checks if a protocol is secure
-   * @param {string} protocol - The protocol to check
-   * @returns {boolean} True if the protocol is secure
-   */
   public static isSecure(protocol: string): boolean {
     try {
       const protocolInfo = this.getProtocol(protocol)
       return protocolInfo.secure
     }
     catch (error) {
-      // For unknown protocols, assume they are insecure
       return false
     }
   }
 
-  /**
-   * Gets the default port for a protocol
-   * @param {string} protocol - The protocol to check
-   * @returns {number | undefined} The default port or undefined if none
-   */
   public static getDefaultPort(protocol: string): number | undefined {
     try {
       const protocolInfo = this.getProtocol(protocol)
@@ -461,17 +408,10 @@ export class ProtocolRegistry {
     }
   }
 
-  /**
-   * Checks if a port is allowed for a protocol
-   * @param {string} protocol - The protocol to check
-   * @param {number} port - The port to validate
-   * @returns {boolean} True if the port is allowed
-   */
   public static isPortAllowed(protocol: string, port: number): boolean {
     try {
       const protocolInfo = this.getProtocol(protocol)
 
-      // If allowed ports list is empty, allow any valid port
       if (
         !protocolInfo.allowedPorts
         || protocolInfo.allowedPorts.length === 0
@@ -482,39 +422,26 @@ export class ProtocolRegistry {
       return protocolInfo.allowedPorts.includes(port)
     }
     catch (error) {
-      // For unknown protocols, check only the range
       return port >= 1 && port <= 65535
     }
   }
 
-  /**
-   * Checks if a protocol requires a host
-   * @param {string} protocol - The protocol to check
-   * @returns {boolean} True if the protocol requires a host
-   */
   public static requiresHost(protocol: string): boolean {
     try {
       const protocolInfo = this.getProtocol(protocol)
       return protocolInfo.requiresHost
     }
     catch (error) {
-      // For unknown protocols, assume a host is required
       return true
     }
   }
 
-  /**
-   * Checks if a protocol supports authentication
-   * @param {string} protocol - The protocol to check
-   * @returns {boolean} True if the protocol supports authentication
-   */
   public static supportsAuth(protocol: string): boolean {
     try {
       const protocolInfo = this.getProtocol(protocol)
       return protocolInfo.supportsAuth
     }
     catch (error) {
-      // For unknown protocols, assume authentication is not supported
       return false
     }
   }
